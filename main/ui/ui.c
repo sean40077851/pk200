@@ -576,7 +576,7 @@ void ui_init(void)
 
     // 延遲 2 秒切換到 Home
     ui_Home_screen_init();
-    lv_timer_create(splash_timer_cb, 2000, NULL);
+    lv_timer_create(splash_timer_cb, 10000, NULL);
     }
 
 void ui_destroy(void)

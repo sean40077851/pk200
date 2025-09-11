@@ -3,85 +3,75 @@
 // LVGL version: 8.3.6
 // Project name: A_Meter_GUI_20240305
 
-#include "../ui.h"
+#include "../ui.h" // 引入UI相關的標頭檔
 
-lv_obj_t * ui_SC_LOGO =NULL;
-lv_obj_t * ui_Lab_ID =NULL;
-lv_obj_t * ui_Lab_Ver =NULL;
-lv_obj_t * ui_Panel1 =NULL;
-lv_obj_t * ui_Label177 =NULL;
-lv_obj_t * ui_ui_Label2 =NULL;
+// 全域UI物件指標宣告
+lv_obj_t * ui_SC_LOGO =NULL;      // LOGO畫面物件
+lv_obj_t * ui_Lab_ID =NULL;       // ID標籤物件
+lv_obj_t * ui_Lab_Ver =NULL;      // 版本標籤物件
+lv_obj_t * ui_Panel1 =NULL;       // 面板物件
+lv_obj_t * ui_Label177 =NULL;     // 版本文字標籤物件
+lv_obj_t * ui_ui_Label2 =NULL;    // 標題標籤物件
+
+// LOGO畫面初始化函數
 void ui_SC_LOGO_screen_init(void)
 {
-    ui_SC_LOGO = lv_obj_create(NULL);
-    lv_obj_clear_flag(ui_SC_LOGO, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_img_src(ui_SC_LOGO, &ui_img_bg1_png, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_SC_LOGO = lv_obj_create(NULL); // 建立LOGO畫面物件
+    lv_obj_clear_flag(ui_SC_LOGO, LV_OBJ_FLAG_SCROLLABLE); // 取消可捲動
+    lv_obj_set_style_bg_img_src(ui_SC_LOGO, &ui_img_bg1_png, LV_PART_MAIN | LV_STATE_DEFAULT); // 設定背景圖片
 
-    ui_Lab_ID = lv_label_create(ui_SC_LOGO);
-    lv_obj_set_width(ui_Lab_ID, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Lab_ID, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Lab_ID, 100);
-    lv_obj_set_y(ui_Lab_ID, 36);
-    lv_obj_set_align(ui_Lab_ID, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Lab_ID, "");
-    lv_obj_set_style_text_color(ui_Lab_ID, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_Lab_ID, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui_Lab_ID, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_Lab_ID, &lv_font_montserrat_12, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_Lab_ID = lv_label_create(ui_SC_LOGO); // 建立ID標籤
+    lv_obj_set_width(ui_Lab_ID, LV_SIZE_CONTENT);   // 寬度自適應
+    lv_obj_set_height(ui_Lab_ID, LV_SIZE_CONTENT);  // 高度自適應
+    lv_obj_set_x(ui_Lab_ID, -100);                   // X座標100
+    lv_obj_set_y(ui_Lab_ID, -80);                    // Y座標36
+    lv_obj_set_align(ui_Lab_ID, LV_ALIGN_CENTER);   // 置中對齊
+    lv_label_set_text(ui_Lab_ID, "WELCOME");               // 預設文字為空
+    lv_obj_set_style_text_color(ui_Lab_ID, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT); // 文字顏色黑
+    lv_obj_set_style_text_opa(ui_Lab_ID, 255, LV_PART_MAIN | LV_STATE_DEFAULT); // 文字不透明
+    lv_obj_set_style_text_align(ui_Lab_ID, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN | LV_STATE_DEFAULT); // 文字自動對齊
+    lv_obj_set_style_text_font(ui_Lab_ID, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT); // 設定字體
 
-    ui_Lab_Ver = lv_label_create(ui_SC_LOGO);
-    lv_obj_set_width(ui_Lab_Ver, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Lab_Ver, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Lab_Ver, 81);
-    lv_obj_set_y(ui_Lab_Ver, 77);
-    lv_obj_set_align(ui_Lab_Ver, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Lab_Ver, "");
-    lv_obj_set_style_text_color(ui_Lab_Ver, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_Lab_Ver, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui_Lab_Ver, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_Lab_Ver, &lv_font_montserrat_12, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_Lab_Ver = lv_label_create(ui_SC_LOGO); // 建立版本標籤
+    lv_obj_set_width(ui_Lab_Ver, LV_SIZE_CONTENT);   // 寬度自適應
+    lv_obj_set_height(ui_Lab_Ver, LV_SIZE_CONTENT);  // 高度自適應
+    lv_obj_set_x(ui_Lab_Ver, 81);                    // X座標81
+    lv_obj_set_y(ui_Lab_Ver, -80);                    // Y座標77
+    lv_obj_set_align(ui_Lab_Ver, LV_ALIGN_CENTER);   // 置中對齊
+    lv_label_set_text(ui_Lab_Ver, "HELLOW Sean");               // 預設文字為空
+    lv_obj_set_style_text_color(ui_Lab_Ver, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT); // 文字顏色黑
+    lv_obj_set_style_text_opa(ui_Lab_Ver, 255, LV_PART_MAIN | LV_STATE_DEFAULT); // 文字不透明
+    lv_obj_set_style_text_align(ui_Lab_Ver, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN | LV_STATE_DEFAULT); // 文字自動對齊
+    lv_obj_set_style_text_font(ui_Lab_Ver, &lv_font_montserrat_12, LV_PART_MAIN | LV_STATE_DEFAULT); // 設定字體
 
-    ui_Image2 = lv_img_create(ui_SC_LOGO);
-    //lv_img_set_src(ui_Image2, &ui_img_logo_png);
-    lv_img_set_src(ui_Image2, &ui_img_contact_png);
-    lv_obj_set_width(ui_Image2, LV_SIZE_CONTENT);   /// 277
-    lv_obj_set_height(ui_Image2, LV_SIZE_CONTENT);    /// 107
-    lv_obj_set_x(ui_Image2, 4);
-    lv_obj_set_y(ui_Image2, -46);
-    lv_obj_set_align(ui_Image2, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Image2, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
-    lv_obj_clear_flag(ui_Image2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_Image2 = lv_img_create(ui_SC_LOGO);           // 建立圖片物件
+    //lv_img_set_src(ui_Image2, &ui_img_logo_png);   // 預設註解掉的LOGO圖
+    lv_img_set_src(ui_Image2, &logo);  // 設定圖片來源為聯絡圖
+    lv_obj_set_width(ui_Image2, LV_SIZE_CONTENT);    // 寬度自適應
+    lv_obj_set_height(ui_Image2, LV_SIZE_CONTENT);   // 高度自適應
+    lv_obj_set_x(ui_Image2, 0);                      // X座標0
+    lv_obj_set_y(ui_Image2, 0);                    // Y座標0
+    lv_obj_set_align(ui_Image2, LV_ALIGN_CENTER);    // 置中對齊
+    lv_obj_add_flag(ui_Image2, LV_OBJ_FLAG_ADV_HITTEST); // 進階點擊測試
+    lv_obj_clear_flag(ui_Image2, LV_OBJ_FLAG_SCROLLABLE); // 取消可捲動
 
-    ui_Panel1 = lv_obj_create(ui_SC_LOGO);
-    lv_obj_set_width(ui_Panel1, 100);
-    lv_obj_set_height(ui_Panel1, 50);
-    lv_obj_set_x(ui_Panel1, 3458);
-    lv_obj_set_y(ui_Panel1, 12);
-    lv_obj_set_align(ui_Panel1, LV_ALIGN_CENTER);
-    lv_obj_clear_flag(ui_Panel1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_Panel1 = lv_obj_create(ui_SC_LOGO);           // 建立面板物件
+    lv_obj_set_width(ui_Panel1, 100);                // 寬度100
+    lv_obj_set_height(ui_Panel1, 50);                // 高度50
+    lv_obj_set_x(ui_Panel1, 3458);                   // X座標3458（應為異常值，可能為設計工具預設）
+    lv_obj_set_y(ui_Panel1, 12);                     // Y座標12
+    lv_obj_set_align(ui_Panel1, LV_ALIGN_CENTER);    // 置中對齊
+    lv_obj_clear_flag(ui_Panel1, LV_OBJ_FLAG_SCROLLABLE); // 取消可捲動
 
-    ui_Label177 = lv_label_create(ui_SC_LOGO);
-    lv_obj_set_width(ui_Label177, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Label177, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Label177, -53);
-    lv_obj_set_y(ui_Label177, 77);
-    lv_obj_set_align(ui_Label177, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Label177, "Ver.");
-    lv_obj_set_style_text_color(ui_Label177, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_Label177, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_Label177, &lv_font_montserrat_12, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Label2 = lv_label_create(ui_SC_LOGO);
-    lv_obj_set_width(ui_Label2, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Label2, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Label2, -53);
-    lv_obj_set_y(ui_Label2, 36);
-    lv_obj_set_align(ui_Label2, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Label2, "     PK100 Camera Demo");
-    lv_obj_set_style_text_color(ui_Label2, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_Label2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_Label2,&lv_font_montserrat_12, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    
-
+    ui_Label2 = lv_label_create(ui_SC_LOGO);         // 建立標題標籤
+    lv_obj_set_width(ui_Label2, LV_SIZE_CONTENT);    // 寬度自適應
+    lv_obj_set_height(ui_Label2, LV_SIZE_CONTENT);   // 高度自適應
+    lv_obj_set_x(ui_Label2, -70);                    // X座標-53
+    lv_obj_set_y(ui_Label2, 100);                     // Y座標36
+    lv_obj_set_align(ui_Label2, LV_ALIGN_CENTER);    // 置中對齊
+    lv_label_set_text(ui_Label2, "   PK200 Camera Demo"); // 設定標題文字
+    lv_obj_set_style_text_color(ui_Label2, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT); // 文字顏色黑
+    lv_obj_set_style_text_opa(ui_Label2, 255, LV_PART_MAIN | LV_STATE_DEFAULT); // 文字不透明
+    lv_obj_set_style_text_font(ui_Label2,&lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT); // 設定字體
 }
