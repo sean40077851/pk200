@@ -1,0 +1,89 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build - Build project",
+            "type": "shell",
+            "command": "D:\\Espressif\\frameworks\\esp-idf-v5.4.2\\export.bat && idf.py build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Set ESP32 Target",
+            "type": "shell",
+            "command": "D:\\Espressif\\frameworks\\esp-idf-v5.4.2\\export.bat && idf.py set-target esp32",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Clean - Clean the project",
+            "type": "shell",
+            "command": "D:\\Espressif\\frameworks\\esp-idf-v5.4.2\\export.bat && idf.py fullclean",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Flash - Flash the device",
+            "type": "shell",
+            "command": "D:\\Espressif\\frameworks\\esp-idf-v5.4.2\\export.bat && idf.py -p COM3 flash",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "dependsOn": "Build - Build project"
+        },
+        {
+            "label": "Monitor - Monitor device output",
+            "type": "shell",
+            "command": "D:\\Espressif\\frameworks\\esp-idf-v5.4.2\\export.bat && idf.py -p COM3 monitor",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        }
+    ]
+}

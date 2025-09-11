@@ -1,0 +1,5 @@
+description: PK200 LCD ESP32-S3 LVGL UI
+targets:
+    - esp32s3
+dependencies:
+  idf: ">=5.0"
