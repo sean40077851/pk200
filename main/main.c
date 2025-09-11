@@ -55,13 +55,6 @@ void app_main(void) {
     // Initialize UI
     ui_init();
     ESP_LOGI(TAG, "UI initialized");
-    lv_scr_load(ui_SC_LOGO);
-
-    // 建立一個計時器，2 秒後切到 Home 畫面
-    lv_timer_t * timer = lv_timer_create([](lv_timer_t * t){
-        lv_scr_load(ui_Home);
-        lv_timer_del(t);   // 用完就刪掉
-    }, 2000, NULL);
 
     // Create LVGL task with higher priority and larger stack for better performance
     xTaskCreate(lvgl_task, "lvgl_task", 8192, NULL, 10, NULL);  // Higher priority (10) and larger stack

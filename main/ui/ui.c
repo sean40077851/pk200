@@ -27,6 +27,11 @@ lv_anim_t * light_Animation(lv_obj_t * TargetObject, int delay);
 // EVENTS
 void ui_event____initial_actions0(lv_event_t * e);
 lv_obj_t * ui____initial_actions0;
+static void splash_timer_cb(lv_timer_t * t)
+{
+    _ui_screen_change(&ui_Home, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Home_screen_init);
+    lv_timer_del(t);  // 只跑一次就刪掉
+}
 
 // IMAGES AND IMAGE SETS
 
@@ -540,6 +545,11 @@ void ui_init(void)
     lv_disp_t * dispp = lv_disp_get_default();
     lv_theme_t * theme = lv_theme_basic_init(dispp);
     lv_disp_set_theme(dispp, theme);
+    ui_SC_LOGO_screen_init();
+    lv_scr_load(ui_SC_LOGO);
+
+    // 延遲 2 秒切換到 Home
+    lv_timer_create(splash_timer_cb, 2000, NULL);
     ui_Home_screen_init();
     ui_Step1_screen_init();
     ui_Step2_screen_init();

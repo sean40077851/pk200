@@ -3,6 +3,10 @@ SET(SOURCES components/ui_comp_button.c
     components/ui_comp_cardbg.c
     components/ui_comp_percent.c
     components/ui_comp.c
+    fonts/ui_font_WD_28.c
+    fonts/ui_font_WD_48.c
+    fonts/ui_font_WD_18.c
+    screens/ui_SC_LOGO.c
     screens/ui_Home.c
     screens/ui_Step1.c
     screens/ui_Step2.c

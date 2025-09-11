@@ -19,7 +19,7 @@ extern "C" {
 
 
 ///////////////////// SCREENS ////////////////////
-
+#include "screens/ui_SC_LOGO.h"
 #include "screens/ui_Home.h"
 #include "screens/ui_Step1.h"
 #include "screens/ui_Step2.h"
