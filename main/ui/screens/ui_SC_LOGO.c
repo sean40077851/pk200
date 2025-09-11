@@ -61,15 +61,15 @@ void ui_SC_LOGO_screen_init(void)
     lv_obj_clear_flag(ui_Panel1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_Label177 = lv_label_create(ui_SC_LOGO);
-    lv_obj_set_width(ui_Label17, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Label17, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Label17, -53);
-    lv_obj_set_y(ui_Label17, 77);
-    lv_obj_set_align(ui_Label17, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Label17, "Ver.");
-    lv_obj_set_style_text_color(ui_Label17, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_Label17, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_Label17, &lv_font_montserrat_12, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_width(ui_Label177, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_Label177, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Label177, -53);
+    lv_obj_set_y(ui_Label177, 77);
+    lv_obj_set_align(ui_Label177, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_Label177, "Ver.");
+    lv_obj_set_style_text_color(ui_Label177, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_Label177, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_Label177, &lv_font_montserrat_12, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Label2 = lv_label_create(ui_SC_LOGO);
     lv_obj_set_width(ui_Label2, LV_SIZE_CONTENT);   /// 1
