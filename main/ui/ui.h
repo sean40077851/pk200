@@ -54,6 +54,7 @@ extern lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
 LV_IMG_DECLARE(logo);
+LV_IMG_DECLARE(phone);
 LV_IMG_DECLARE(ui_img_bg1_png);    // assets/bg1.png
 LV_IMG_DECLARE(ui_img_left_side_png);    // assets/left_side.png
 LV_IMG_DECLARE(ui_img_pricing_png);    // assets/pricing.png
