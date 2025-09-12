@@ -7,6 +7,7 @@
 
 // 全域UI物件指標宣告
 lv_obj_t * ui_SC_LOGO =NULL;      // LOGO畫面物件
+lv_obj_t * ui_Image2 =NULL;
 lv_obj_t * ui_Lab_ID =NULL;       // ID標籤物件
 lv_obj_t * ui_Lab_Ver =NULL;      // 版本標籤物件
 lv_obj_t * ui_Panel1 =NULL;       // 面板物件
