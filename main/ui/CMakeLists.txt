@@ -3,6 +3,10 @@ SET(SOURCES components/ui_comp_button.c
     components/ui_comp_cardbg.c
     components/ui_comp_percent.c
     components/ui_comp.c
+    fonts/ui_font_WD_28.c
+    fonts/ui_font_WD_48.c
+    fonts/ui_font_WD_18.c
+    screens/ui_SC_LOGO.c
     screens/ui_Home.c
     screens/ui_Step1.c
     screens/ui_Step2.c
@@ -13,6 +17,8 @@ SET(SOURCES components/ui_comp_button.c
     ui.c
     components/ui_comp_hook.c
     ui_helpers.c
+    images/logo.c
+    images/phone.c
     images/ui_img_bg1_png.c
     images/ui_img_left_side_png.c
     images/ui_img_pricing_png.c
