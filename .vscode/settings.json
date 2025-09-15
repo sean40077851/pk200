@@ -16,7 +16,9 @@
   "files.associations": {
     "*.h": "c",
     "*.c": "c",
-    "ui_SC_LOGO.C": "cpp"
+    "ui_SC_LOGO.C": "cpp",
+    "format": "c",
+    "chrono": "c"
   },
   "C_Cpp.default.compilerPath": "D:\\Espressif\\tools\\xtensa-esp-elf\\esp-14.2.0_20241119\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe",
   "C_Cpp.default.cStandard": "c17",
