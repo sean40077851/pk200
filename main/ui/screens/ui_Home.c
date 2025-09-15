@@ -243,7 +243,7 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     scene_label = lv_label_create(ui_scene1);
     lv_label_set_text(scene_label, "SCENE1");
     lv_obj_center(scene_label);
-    lv_obj_set_style_text_color(ui_time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(scene_label, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_add_event_cb(ui_scene1, ui_event_button1_button, LV_EVENT_ALL, NULL);
     
     ui_scene2 = lv_btn_create(ui_scene_group);
@@ -258,7 +258,7 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     scene_label2 = lv_label_create(ui_scene2);
     lv_label_set_text(scene_label2, "SCENE2");
     lv_obj_center(scene_label2);
-    lv_obj_set_style_text_color(ui_time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(scene_label2, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_add_event_cb(ui_scene2, ui_event_button1_button, LV_EVENT_ALL, NULL);
 
     ui_scene3 = lv_btn_create(ui_scene_group);
@@ -273,7 +273,7 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     scene_label3 = lv_label_create(ui_scene3);
     lv_label_set_text(scene_label3, "SCENE3");
     lv_obj_center(scene_label3);
-    lv_obj_set_style_text_color(ui_time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(scene_label3, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_add_event_cb(ui_scene3, ui_event_button1_button, LV_EVENT_ALL, NULL);
 
     ui_scene4 = lv_btn_create(ui_scene_group);
@@ -288,7 +288,7 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     scene_label4 = lv_label_create(ui_scene4);
     lv_label_set_text(scene_label4, "SCENE4");
     lv_obj_center(scene_label4);
-    lv_obj_set_style_text_color(ui_time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(scene_label4, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_add_event_cb(ui_scene4, ui_event_button1_button, LV_EVENT_ALL, NULL);
 
     ui_scene5 = lv_btn_create(ui_scene_group);
@@ -303,7 +303,7 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     scene_label5 = lv_label_create(ui_scene5);
     lv_label_set_text(scene_label5, "SCENE5");
     lv_obj_center(scene_label5);
-    lv_obj_set_style_text_color(ui_time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(scene_label5, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_add_event_cb(ui_scene5, ui_event_button1_button, LV_EVENT_ALL, NULL);
 
     ui_scene6 = lv_btn_create(ui_scene_group);
@@ -318,7 +318,7 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     scene_label6 = lv_label_create(ui_scene6);
     lv_label_set_text(scene_label6, "SCENE6");
     lv_obj_center(scene_label6);
-    lv_obj_set_style_text_color(ui_time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(scene_label6, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_add_event_cb(ui_scene6, ui_event_button1_button, LV_EVENT_ALL, NULL);
 
     ui_switch_group = lv_obj_create(ui_Home); // 創建下方開關群組
