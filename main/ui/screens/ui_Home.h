@@ -16,6 +16,13 @@ extern void ui_Home_screen_destroy(void);
 
 extern void ui_event_menu_icon(lv_event_t * e);
 extern void ui_event_button1_button(lv_event_t * e);
+extern void ui_event_sw1(lv_event_t * e);
+extern void ui_event_sw2(lv_event_t * e);
+extern void ui_event_sw3(lv_event_t * e);
+extern void ui_event_sw4(lv_event_t * e);
+extern void ui_event_sw5(lv_event_t * e);
+extern void ui_event_sw6(lv_event_t * e);
+
 // === Home 主畫面 ===
 extern lv_obj_t * ui_Home;
 
@@ -43,7 +50,8 @@ extern lv_obj_t * ui_sw3;
 extern lv_obj_t * ui_sw4;
 extern lv_obj_t * ui_sw5;
 extern lv_obj_t * ui_sw6;
-
+extern lv_obj_t * ui_sw1_icon;
+extern lv_obj_t * ui_sw1_label;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus
