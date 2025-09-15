@@ -54,6 +54,7 @@ extern lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
 LV_IMG_DECLARE(logo);
+LV_IMG_DECLARE(menuicon);
 LV_IMG_DECLARE(OnLight);
 LV_IMG_DECLARE(OffLight);
 LV_IMG_DECLARE(logohome);

@@ -1,4 +1,6 @@
 #include "../ui.h"  // 包含UI頭文件
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 
 lv_obj_t * ui_Home;
@@ -40,8 +42,6 @@ lv_obj_t * ui_sw5_icon;
 lv_obj_t * ui_sw5_label;
 lv_obj_t * ui_sw6_icon;
 lv_obj_t * ui_sw6_label;
-
-
 void ui_event_menu_icon(lv_event_t * e)      // 菜單圖標事件處理函數
 {
     lv_event_code_t event_code = lv_event_get_code(e);  // 獲取事件代碼
@@ -49,6 +49,26 @@ void ui_event_menu_icon(lv_event_t * e)      // 菜單圖標事件處理函數
     if(event_code == LV_EVENT_CLICKED) {                // 如果是點擊事件
        _ui_screen_change(&ui_Step1, LV_SCR_LOAD_ANIM_FADE_ON, 0, 0, &ui_Step1_screen_init);  // 切換到Step1畫面並淡入效果
     }
+}
+void ui_time_tick_task(lv_timer_t * t) {
+    static int hours = 12,min=0,sec=0;
+    char buf[16];
+        sec++;
+        if(sec==60){
+            sec=0;
+            min++;
+        }
+        if(min==60){
+            min=0;
+            hours++;
+        }
+        if(hours==24){
+            hours=0;
+        }
+        snprintf(buf, sizeof(buf), "%02u:%02u:%02u", hours, min, sec);
+        lv_label_set_text(ui_time, buf);
+        printf("tick: %s\n", buf); // 加這行
+    
 }
 void ui_event_button1_button(lv_event_t * e)           // 按鈕1事件處理函數
 {
@@ -58,6 +78,7 @@ void ui_event_button1_button(lv_event_t * e)           // 按鈕1事件處理函
         _ui_screen_change(&ui_Step1, LV_SCR_LOAD_ANIM_FADE_ON, 0, 0, &ui_Step1_screen_init);  // 切換到Step1畫面並淡入效果
     }
 }
+
 void ui_event_sw1(lv_event_t * e) {
     static bool sw1_state = false;
     sw1_state = !sw1_state;
@@ -164,8 +185,8 @@ void ui_event_sw6(lv_event_t * e) {
 }
 void ui_Home_screen_init(void)          // 主畫面初始化函數
 {
-
-     ui_Home = lv_obj_create(NULL);     // 創建主畫面物件，父物件為NULL
+    
+    ui_Home = lv_obj_create(NULL);     // 創建主畫面物件，父物件為NULL
     lv_obj_clear_flag(ui_Home, LV_OBJ_FLAG_SCROLLABLE);      // 清除可捲動旗標
     // lv_obj_set_style_bg_img_src(ui_Home, &ui_img_bg1_png, LV_PART_MAIN | LV_STATE_DEFAULT);  // 設置背景圖片（註解掉）
     lv_obj_set_style_bg_color(ui_Home, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT); // 設置背景顏色為黑色
@@ -197,8 +218,8 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     ui_date = lv_label_create(ui_topbar);
     lv_obj_set_width(ui_date, LV_SIZE_CONTENT);
     lv_obj_set_height(ui_date, LV_SIZE_CONTENT);
-    lv_obj_set_x(ui_date, -10); // 根據需求微調
-    lv_obj_set_y(ui_date, 10);
+    lv_obj_set_x(ui_date, -30); // 根據需求微調
+    lv_obj_set_y(ui_date, 15);
     lv_obj_set_align(ui_date, LV_ALIGN_TOP_MID);
     lv_label_set_text(ui_date, "08/24"); // 兩行顯示
     lv_obj_set_style_text_color(ui_date, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -206,15 +227,24 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     lv_obj_set_style_text_font(ui_date, &lv_font_montserrat_34, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_time = lv_label_create(ui_topbar);
-    lv_obj_set_width(ui_time, LV_SIZE_CONTENT);
+    lv_obj_set_width(ui_time, 180);
     lv_obj_set_height(ui_time, LV_SIZE_CONTENT);
-    lv_obj_set_x(ui_time, 170); // 根據需求微調
-    lv_obj_set_y(ui_time, 10);
+    lv_obj_set_x(ui_time, 130); // 根據需求微調
+    lv_obj_set_y(ui_time, 15);
     lv_obj_set_align(ui_time, LV_ALIGN_TOP_MID);
-    lv_label_set_text(ui_time, "18:08");
+    lv_label_set_text(ui_time, "00:00:00");
     lv_obj_set_style_text_color(ui_time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_time, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_time, &lv_font_montserrat_34, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_menu_icon = lv_img_create(ui_topbar); // 創建菜單圖標
+    lv_img_set_src(ui_menu_icon, &menuicon); // 設置圖標
+    lv_obj_set_width(ui_menu_icon, LV_SIZE_CONTENT); // 寬度自適應
+    lv_obj_set_height(ui_menu_icon, LV_SIZE_CONTENT); // 高度自適應
+    lv_obj_set_y(ui_menu_icon, 10); // Y座標-20
+    lv_obj_set_align(ui_menu_icon, LV_ALIGN_TOP_RIGHT); // 對齊到頂部右側
+    lv_obj_add_flag(ui_menu_icon, LV_OBJ_FLAG_CLICKABLE); // 可點擊
+    lv_obj_add_event_cb(ui_menu_icon, ui_event_menu_icon, LV_EVENT_ALL, NULL); // 添加事件回調
 
 
     ui_scene_group = lv_obj_create(ui_Home); // 創建場景按鈕群組
@@ -243,7 +273,7 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     scene_label = lv_label_create(ui_scene1);
     lv_label_set_text(scene_label, "SCENE1");
     lv_obj_center(scene_label);
-    lv_obj_set_style_text_color(ui_time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(scene_label, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_add_event_cb(ui_scene1, ui_event_button1_button, LV_EVENT_ALL, NULL);
     
     ui_scene2 = lv_btn_create(ui_scene_group);
@@ -258,7 +288,7 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     scene_label2 = lv_label_create(ui_scene2);
     lv_label_set_text(scene_label2, "SCENE2");
     lv_obj_center(scene_label2);
-    lv_obj_set_style_text_color(ui_time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(scene_label2, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_add_event_cb(ui_scene2, ui_event_button1_button, LV_EVENT_ALL, NULL);
 
     ui_scene3 = lv_btn_create(ui_scene_group);
@@ -273,7 +303,7 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     scene_label3 = lv_label_create(ui_scene3);
     lv_label_set_text(scene_label3, "SCENE3");
     lv_obj_center(scene_label3);
-    lv_obj_set_style_text_color(ui_time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(scene_label3, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_add_event_cb(ui_scene3, ui_event_button1_button, LV_EVENT_ALL, NULL);
 
     ui_scene4 = lv_btn_create(ui_scene_group);
@@ -288,7 +318,7 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     scene_label4 = lv_label_create(ui_scene4);
     lv_label_set_text(scene_label4, "SCENE4");
     lv_obj_center(scene_label4);
-    lv_obj_set_style_text_color(ui_time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(scene_label4, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_add_event_cb(ui_scene4, ui_event_button1_button, LV_EVENT_ALL, NULL);
 
     ui_scene5 = lv_btn_create(ui_scene_group);
@@ -303,7 +333,7 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     scene_label5 = lv_label_create(ui_scene5);
     lv_label_set_text(scene_label5, "SCENE5");
     lv_obj_center(scene_label5);
-    lv_obj_set_style_text_color(ui_time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(scene_label5, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_add_event_cb(ui_scene5, ui_event_button1_button, LV_EVENT_ALL, NULL);
 
     ui_scene6 = lv_btn_create(ui_scene_group);
@@ -318,7 +348,7 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     scene_label6 = lv_label_create(ui_scene6);
     lv_label_set_text(scene_label6, "SCENE6");
     lv_obj_center(scene_label6);
-    lv_obj_set_style_text_color(ui_time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(scene_label6, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_add_event_cb(ui_scene6, ui_event_button1_button, LV_EVENT_ALL, NULL);
 
     ui_switch_group = lv_obj_create(ui_Home); // 創建下方開關群組
@@ -455,6 +485,7 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     lv_obj_set_style_text_font(ui_sw6_label, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_align(ui_sw6_label, LV_ALIGN_CENTER, 0, 10);
     lv_obj_add_event_cb(ui_sw6, ui_event_sw6, LV_EVENT_CLICKED, NULL);
+    
 
 }
 
