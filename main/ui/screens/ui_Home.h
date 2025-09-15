@@ -13,27 +13,45 @@ extern "C" {
 // SCREEN: ui_Home
 extern void ui_Home_screen_init(void);
 extern void ui_Home_screen_destroy(void);
-extern void ui_event_Home(lv_event_t * e);
-extern lv_obj_t * ui_Home;
-extern lv_obj_t * ui_content_group1;
-extern lv_obj_t * ui_slidebar1;
-extern lv_obj_t * ui_icon_group1;
-extern lv_obj_t * ui_pricing_icon1;
-extern lv_obj_t * ui_pricing_label1;
-extern lv_obj_t * ui_icon_group2;
-extern lv_obj_t * ui_help_icon1;
-extern lv_obj_t * ui_help_label1;
-extern lv_obj_t * ui_content1;
-extern lv_obj_t * ui_info_group1;
-extern lv_obj_t * ui_contact_icon1;
-extern lv_obj_t * ui_call_number1;
-extern lv_obj_t * ui_date1;
-extern lv_obj_t * ui_charger_id;
-extern lv_obj_t * ui_card;
-extern lv_obj_t * ui_button_group;
+
+extern void ui_event_menu_icon(lv_event_t * e);
 extern void ui_event_button1_button(lv_event_t * e);
-extern lv_obj_t * ui_button1;
-extern lv_obj_t * ui_Image2;
+extern void ui_event_sw1(lv_event_t * e);
+extern void ui_event_sw2(lv_event_t * e);
+extern void ui_event_sw3(lv_event_t * e);
+extern void ui_event_sw4(lv_event_t * e);
+extern void ui_event_sw5(lv_event_t * e);
+extern void ui_event_sw6(lv_event_t * e);
+
+// === Home 主畫面 ===
+extern lv_obj_t * ui_Home;
+
+// === 頂部區域 (Top bar) ===
+extern lv_obj_t * ui_topbar;     // 上方資訊列
+extern lv_obj_t * ui_logo;       // 左上角 Logo Label/Image
+extern lv_obj_t * ui_date;       // 日期
+extern lv_obj_t * ui_time;       // 時間
+extern lv_obj_t * ui_menu_icon;  // 右上角三條線 icon
+
+// === 中間區域 (Scene Buttons) ===
+extern lv_obj_t * ui_scene_group; // 場景按鈕群組
+extern lv_obj_t * ui_scene1;
+extern lv_obj_t * ui_scene2;
+extern lv_obj_t * ui_scene3;
+extern lv_obj_t * ui_scene4;
+extern lv_obj_t * ui_scene5;
+extern lv_obj_t * ui_scene6;
+extern lv_obj_t * scene_label;
+// === 底部區域 (Switch Buttons) ===
+extern lv_obj_t * ui_switch_group; // 下方開關群組
+extern lv_obj_t * ui_sw1;
+extern lv_obj_t * ui_sw2;
+extern lv_obj_t * ui_sw3;
+extern lv_obj_t * ui_sw4;
+extern lv_obj_t * ui_sw5;
+extern lv_obj_t * ui_sw6;
+extern lv_obj_t * ui_sw1_icon;
+extern lv_obj_t * ui_sw1_label;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus
