@@ -40,18 +40,17 @@ void app_main(void) {
     }
     ESP_ERROR_CHECK(ret);
     ESP_LOGI(TAG, "NVS initialized successfully");
-
+    wifi_init();
+    ESP_LOGI(TAG, "WiFi initialized");
     // Initialize LVGL
     lv_init();
     ESP_LOGI(TAG, "LVGL initialized");
-
-    wifi_init();
-    ESP_LOGI(TAG, "WiFi initialized");
 
     // Initialize display driver
     display_init();
     ESP_LOGI(TAG, "Display driver initialized");
 
+    
     // Initialize touch driver
     touch_init(GPIO_NUM_10, GPIO_NUM_9, GPIO_NUM_18, GPIO_NUM_8);  // SDA, SCL, RST, INT pins
     ESP_LOGI(TAG, "Touch driver initialized");

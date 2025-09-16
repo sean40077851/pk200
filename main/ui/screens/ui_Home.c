@@ -1,7 +1,7 @@
 #include "../ui.h"  // 包含UI頭文件
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
+#include <time.h>
 
 lv_obj_t * ui_Home;
 lv_obj_t * ui_topbar;       // 上方資訊列
@@ -51,24 +51,28 @@ void ui_event_menu_icon(lv_event_t * e)      // 菜單圖標事件處理函數
     }
 }
 void ui_time_tick_task(lv_timer_t * t) {
-    static int hours = 12,min=0,sec=0;
-    char buf[16];
-        sec++;
-        if(sec==60){
-            sec=0;
-            min++;
-        }
-        if(min==60){
-            min=0;
-            hours++;
-        }
-        if(hours==24){
-            hours=0;
-        }
-        snprintf(buf, sizeof(buf), "%02u:%02u:%02u", hours, min, sec);
+    time_t now;                // 用來儲存目前的 UNIX 時間（秒數）
+    struct tm timeinfo;        // 用來儲存轉換後的本地時間結構
+    char buf[16];              // 時間字串緩衝區
+    char datebuf[16];          // 日期字串緩衝區
+
+    time(&now);                // 取得目前的 UNIX 時間（秒數）
+    localtime_r(&now, &timeinfo); // 將 UNIX 時間轉換成本地時間（struct tm）
+
+    // 檢查時間是否已經同步（tm_year < 2020-1900 代表還沒同步到正確時間）
+    if (timeinfo.tm_year < (2020 - 1900)) {
+        // 時間還沒同步，顯示預設字串
+        lv_label_set_text(ui_time, "--:--:--");
+        lv_label_set_text(ui_date, "--/--");
+    } else {
+        // 格式化時間字串（時:分:秒），並顯示到 ui_time label
+        snprintf(buf, sizeof(buf), "%02d:%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
         lv_label_set_text(ui_time, buf);
-        printf("tick: %s\n", buf); // 加這行
-    
+
+        // 格式化日期字串（月/日），並顯示到 ui_date label
+        snprintf(datebuf, sizeof(datebuf), "%02d/%02d", timeinfo.tm_mon + 1, timeinfo.tm_mday);
+        lv_label_set_text(ui_date, datebuf);
+    }
 }
 void ui_event_button1_button(lv_event_t * e)           // 按鈕1事件處理函數
 {
@@ -221,7 +225,7 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     lv_obj_set_x(ui_date, -30); // 根據需求微調
     lv_obj_set_y(ui_date, 15);
     lv_obj_set_align(ui_date, LV_ALIGN_TOP_MID);
-    lv_label_set_text(ui_date, "08/24"); // 兩行顯示
+    lv_label_set_text(ui_date, "00/00"); // 兩行顯示
     lv_obj_set_style_text_color(ui_date, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_date, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_date, &lv_font_montserrat_34, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -232,7 +236,7 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     lv_obj_set_x(ui_time, 130); // 根據需求微調
     lv_obj_set_y(ui_time, 15);
     lv_obj_set_align(ui_time, LV_ALIGN_TOP_MID);
-    lv_label_set_text(ui_time, "00:00:00");
+    lv_label_set_text(ui_time, "00:00:00"); // 初始時間
     lv_obj_set_style_text_color(ui_time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_time, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_time, &lv_font_montserrat_34, LV_PART_MAIN | LV_STATE_DEFAULT);
