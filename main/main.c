@@ -8,13 +8,14 @@
 #include "esp_system.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
+#include "esp_event.h"
 #include "driver/gpio.h"
 
 // LVGL includes
 #include "lvgl.h"
 #include "display_driver.h"
 #include "touch_driver.h"
-
+#include "wifi.h"
 // UI includes
 #include "ui/ui.h"
 
@@ -43,6 +44,9 @@ void app_main(void) {
     // Initialize LVGL
     lv_init();
     ESP_LOGI(TAG, "LVGL initialized");
+
+    wifi_init();
+    ESP_LOGI(TAG, "WiFi initialized");
 
     // Initialize display driver
     display_init();
