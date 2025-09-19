@@ -18,7 +18,14 @@
     "*.c": "c",
     "ui_SC_LOGO.C": "cpp",
     "format": "c",
-    "chrono": "c"
+    "chrono": "c",
+    "ctime": "c",
+    "xiosbase": "c",
+    "iterator": "c",
+    "memory": "c",
+    "random": "c",
+    "ranges": "c",
+    "xutility": "c"
   },
   "C_Cpp.default.compilerPath": "D:\\Espressif\\tools\\xtensa-esp-elf\\esp-14.2.0_20241119\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe",
   "C_Cpp.default.cStandard": "c17",

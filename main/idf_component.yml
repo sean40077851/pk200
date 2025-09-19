@@ -3,3 +3,4 @@ targets:
     - esp32s3
 dependencies:
   idf: ">=5.0"
+  
