@@ -27,6 +27,7 @@ void lvgl_task(void *parameter) {
     while (1) {
         lv_timer_handler();
         vTaskDelay(pdMS_TO_TICKS(5));  // 5ms delay for ~200Hz task rate, better responsiveness
+        
     }
 }
 
@@ -65,6 +66,6 @@ void app_main(void) {
     // Create LVGL task with higher priority and larger stack for better performance
     xTaskCreate(lvgl_task, "lvgl_task", 8192, NULL, 10, NULL);  // Higher priority (10) and larger stack
     ESP_LOGI(TAG, "LVGL task created with high priority");
-
+    
     ESP_LOGI(TAG, "Application started successfully");
 }

@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 extern esp_mqtt_client_handle_t mqtt_handle;
-
+static void mqtt_ui_update_cb(void *param);
 void mqtt_eveny_callback(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data);
 void mqtt_init(void);
 
