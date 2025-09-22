@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "esp_log.h"
 #include "../ui.h"  // 包含UI頭文件
+#include "my_mqtt.h" // 包含 MQTT 頭文件
 lv_obj_t * ui_input_label;   // 顯示輸入數字用
 static char input_buf[16] = {0};    // 存輸入的數字
 #define TAG "UI_Step2"
@@ -26,9 +27,15 @@ void num_btn_event(lv_event_t * e)
     lv_obj_t * btn = lv_event_get_target(e);
     const char * txt = lv_label_get_text(lv_obj_get_child(btn, 0));
 
-    if(strlen(input_buf) < sizeof(input_buf)-1) {
-        strcat(input_buf, txt);  // 把數字加到字串後面
-        lv_label_set_text(ui_input_label, input_buf);
+    if(event_code == LV_EVENT_SCREEN_LOAD_START) {`
+        bottom_on_Animation(ui_button9, 0);
+        left_on_Animation(ui_card2, 0);
+        phone_Animation(ui_phone, 0);
+        top_on_Animation(ui_Image1, 0);
+    }
+    if(event_code == LV_EVENT_SCREEN_UNLOAD_START) {
+        left_off_Animation(ui_card2, 0);
+        bottom_off_Animation(ui_phone, 100);
     }
 }
 
@@ -37,7 +44,19 @@ void enter_btn_event(lv_event_t * e)
 {
     LV_UNUSED(e);
     LV_LOG_USER("輸入完成: %s", input_buf);
-    // TODO: 在這裡加入定時器設定邏輯
+
+    // 把輸入的字串 Publish 到 MQTT broker
+    if (mqtt_handle) {
+        esp_mqtt_client_publish(mqtt_handle,"test/mqtt_topic",   // 發佈的 Topic
+                                input_buf,           // 發佈的訊息內容
+                                0,                   // 自動算長度
+                                1,                   // QoS = 1
+                                0);                  // retain = 0
+        LV_LOG_USER("已發送到 MQTT: %s", input_buf);
+    } else {
+        LV_LOG_USER("MQTT 尚未初始化");
+    }
+    
 }
 
 // 返回鍵事件
