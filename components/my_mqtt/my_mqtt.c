@@ -2,7 +2,7 @@
 #include "mqtt_client.h"
 #include "esp_log.h"
 #include "my_mqtt.h"
-
+#include "../../main/ui/ui.h"
 #define TAG             "MQTT"
 #define MQTT_ADDRESS    "mqtt://27.105.113.156"  
 #define MQTT_USER       "test"  
@@ -12,6 +12,9 @@
 #define MQTT_SUB_TOPIC  "test/esp_topic"
 #define MQTT_PUB_TOPIC  "test/mqtt_topic"
 esp_mqtt_client_handle_t mqtt_handle = NULL;
+static void mqtt_ui_update_cb(void *param) {
+     ESP_LOGI("MQTT", "收到 change 指令，更新 UI");
+     lv_scr_load(ui_Home);  }
 
 void mqtt_eveny_callback(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data) {
 
@@ -57,6 +60,22 @@ void mqtt_eveny_callback(void *handler_args, esp_event_base_t base, int32_t even
             printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
             // 印出收到的資料內容
             printf("DATA=%.*s\r\n", event->data_len, event->data);
+
+            if(strncmp(event->topic, MQTT_SUB_TOPIC,event->topic_len) == 0) {
+                // 如果收到的 topic 是我們訂閱的 MQTT_SUB_TOPIC，則處理資料
+                ESP_LOGI(TAG, "Received message on subscribed topic: %.*s", event->data_len, event->data);
+                // 這裡可以加入對收到資料的處理邏輯
+                char msg[32];
+                memset(msg, 0, sizeof(msg));
+                memcpy(msg, event->data, event->data_len); // 複製資料
+                msg[event->data_len] = '\0';                // 加上結尾
+
+                if (strcmp(msg, "change") == 0) {
+                    lv_async_call(mqtt_ui_update_cb, NULL); 
+                } else if (strcmp(msg, "OFF") == 0) {
+                    ESP_LOGI(TAG, "Turning OFF the device");
+                }
+            }
             break;
 
         // 發生錯誤事件
