@@ -47,7 +47,7 @@ void ui_event_menu_icon(lv_event_t * e)      // 菜單圖標事件處理函數
     lv_event_code_t event_code = lv_event_get_code(e);  // 獲取事件代碼
 
     if(event_code == LV_EVENT_CLICKED) {                // 如果是點擊事件
-       _ui_screen_change(&ui_Step1, LV_SCR_LOAD_ANIM_FADE_ON, 0, 0, &ui_Step1_screen_init);  // 切換到Step1畫面並淡入效果
+       _ui_screen_change(&ui_Step2, LV_SCR_LOAD_ANIM_FADE_ON, 0, 0, &ui_Step2_screen_init);  // 切換到Step1畫面並淡入效果
     }
 }
 void ui_time_tick_task(lv_timer_t * t) {
@@ -81,7 +81,7 @@ void ui_event_button1_button(lv_event_t * e)           // 按鈕1事件處理函
     if(event_code == LV_EVENT_CLICKED) {                // 如果是點擊事件
         _ui_screen_change(&ui_Step1, LV_SCR_LOAD_ANIM_FADE_ON, 0, 0, &ui_Step1_screen_init);  // 切換到Step1畫面並淡入效果
     }
-}
+} 
 
 void ui_event_sw1(lv_event_t * e) {
     static bool sw1_state = false;
@@ -489,6 +489,7 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     lv_obj_set_style_text_font(ui_sw6_label, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_align(ui_sw6_label, LV_ALIGN_CENTER, 0, 10);
     lv_obj_add_event_cb(ui_sw6, ui_event_sw6, LV_EVENT_CLICKED, NULL);
+    
     
 
 }

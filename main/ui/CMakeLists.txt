@@ -18,6 +18,7 @@ SET(SOURCES components/ui_comp_button.c
     components/ui_comp_hook.c
     ui_helpers.c
     images/logo.c
+    images/back.c
     images/menuicon.c
     images/OffLight.c
     images/OnLight.c
