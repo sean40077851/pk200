@@ -51,7 +51,8 @@ void enter_btn_event(lv_event_t * e)
     } else {
         LV_LOG_USER("MQTT 尚未初始化");
     }
-    
+    input_buf[0] = '\0';  // 清空輸入
+    lv_label_set_text(ui_input_label, "");
 }
 
 // 返回鍵事件
