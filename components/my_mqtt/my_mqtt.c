@@ -76,23 +76,34 @@ static void handle_set_command(int set_value) {
     
     switch (set_value) {
         case 3:  // 裝置重開指令
-            ESP_LOGI(TAG, "Device restart command received");
-            vTaskDelay(pdMS_TO_TICKS(1000)); // 延遲1秒讓回應送出
+            ESP_LOGI(TAG, "Device restart command received, restarting in 2 seconds...");
+            // 先發送確認訊息
+            if (mqtt_connected && mqtt_handle) {
+                char ack_msg[64];
+                snprintf(ack_msg, sizeof(ack_msg), "{\"status\":\"restarting\",\"mac\":\"%s\"}", 
+                         g_device_config.device_mac);
+                esp_mqtt_client_publish(mqtt_handle, device_topic, ack_msg, 0, 0, 0);
+            }
+            vTaskDelay(pdMS_TO_TICKS(2000)); // 延遲2秒讓回應送出
             esp_restart();
             break;
             
         case 7:  // 設定 MQTT (會配合 MQTTset topic)
-            ESP_LOGI(TAG, "MQTT setup mode activated");
+            ESP_LOGI(TAG, "MQTT setup mode activated - waiting for MQTTset data");
+            // 實際處理在 MQTTset topic 中
             break;
             
         case 8:  // 讀取 WiFi 及 MQTT 資訊
             ESP_LOGI(TAG, "Sending WiFi and MQTT info");
+            vTaskDelay(pdMS_TO_TICKS(100));  // 短暫延遲避免訊息擁塞
             mqtt_publish_wifi_info();
+            vTaskDelay(pdMS_TO_TICKS(100));
             mqtt_publish_mqtt_info();
             break;
             
         case 9:  // 設定 IP (會配合 WIFIset topic)
-            ESP_LOGI(TAG, "WiFi IP setup mode activated");
+            ESP_LOGI(TAG, "WiFi IP setup mode activated - waiting for WIFIset data");
+            // 實際處理在 WIFIset topic 中
             break;
             
         default:
@@ -119,10 +130,27 @@ static void handle_mqttset_command(const char* data, int data_len) {
     esp_err_t ret = config_update_mqtt_from_json(json_buffer);
     if (ret == ESP_OK) {
         ESP_LOGI(TAG, "MQTT configuration updated successfully");
-        ESP_LOGI(TAG, "Device will reconnect with new settings...");
         
-        // 設定重連標記，讓獨立任務處理
-        mqtt_need_reconnect = true;
+        // 檢查設定是否真的有改變
+        // 如果 SSID 和 MQTT host 都沒變，就不需要重連
+        // 這可以避免重複收到相同設定時被 AP 踢掉
+        static char last_ssid[64] = {0};
+        static char last_host[128] = {0};
+        
+        bool need_reconnect = false;
+        if (strcmp(last_ssid, g_device_config.wifi_ssid) != 0 ||
+            strcmp(last_host, g_device_config.mqtt_host) != 0) {
+            need_reconnect = true;
+            strcpy(last_ssid, g_device_config.wifi_ssid);
+            strcpy(last_host, g_device_config.mqtt_host);
+        }
+        
+        if (need_reconnect) {
+            ESP_LOGI(TAG, "Configuration changed, device will reconnect...");
+            mqtt_need_reconnect = true;
+        } else {
+            ESP_LOGI(TAG, "Configuration unchanged, no reconnection needed");
+        }
         
     } else {
         ESP_LOGE(TAG, "Failed to update MQTT configuration");
@@ -148,8 +176,10 @@ static void handle_wifiset_command(const char* data, int data_len) {
     if (ret == ESP_OK) {
         ESP_LOGI(TAG, "WiFi IP configuration updated successfully");
         
-        // 套用新的 IP 設定
-        wifi_apply_ip_config();
+        // 如果是 IP 模式變更，需要重連
+        // 只有從固定IP切到DHCP或反之才需要重連
+        // 這裡先套用設定，不立即重連（避免被 AP 踢掉）
+        ESP_LOGI(TAG, "IP config will be applied on next connection");
         
     } else {
         ESP_LOGE(TAG, "Failed to update WiFi IP configuration");
@@ -328,26 +358,33 @@ void mqtt_publish_device_info(void) {
 void mqtt_reconnect_task(void *pvParameters) {
     while (1) {
         if (mqtt_need_reconnect) {
-            ESP_LOGI(TAG, "Reconnect task: Starting reconnection...");
+            ESP_LOGI(TAG, "Reconnect task: Starting reconnection in 3 seconds...");
+            
+            // 等待3秒讓當前的 MQTT 訊息處理完成
+            vTaskDelay(pdMS_TO_TICKS(3000));
             
             // 停止 MQTT
             if (mqtt_handle) {
                 mqtt_connected = false;
+                ESP_LOGI(TAG, "Stopping MQTT client...");
                 esp_mqtt_client_stop(mqtt_handle);
+                vTaskDelay(pdMS_TO_TICKS(1000));
                 esp_mqtt_client_destroy(mqtt_handle);
                 mqtt_handle = NULL;
+                ESP_LOGI(TAG, "MQTT client stopped");
             }
             
-            // 等待一下
-            vTaskDelay(pdMS_TO_TICKS(2000));
+            // 再等待1秒讓系統穩定
+            vTaskDelay(pdMS_TO_TICKS(1000));
             
             // 重新連線 WiFi
+            ESP_LOGI(TAG, "Starting WiFi reconnection...");
             wifi_reconnect_with_new_config();
             
             // 清除標記
             mqtt_need_reconnect = false;
             
-            ESP_LOGI(TAG, "Reconnect task: Reconnection initiated");
+            ESP_LOGI(TAG, "Reconnect task: Reconnection process completed");
         }
         
         vTaskDelay(pdMS_TO_TICKS(100));
