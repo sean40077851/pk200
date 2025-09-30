@@ -79,19 +79,23 @@ void wifi_apply_ip_config(void) {
 
 // WiFi 重新連線（使用新設定）
 void wifi_reconnect_with_new_config(void) {
-    ESP_LOGI(TAG, "Reconnecting WiFi with new configuration");
+    ESP_LOGI(TAG, "=== Reconnecting WiFi with new configuration ===");
     
     wifi_connected = false;
     retry_count = 0;
     
-    // 斷開並停止 WiFi
+    // 先優雅地斷開連線
+    ESP_LOGI(TAG, "Gracefully disconnecting from current AP...");
     esp_wifi_disconnect();
-    esp_wifi_stop();
+    vTaskDelay(pdMS_TO_TICKS(1000));  // 等待斷線完成
     
-    // 等待一下讓系統穩定
-    vTaskDelay(pdMS_TO_TICKS(2000));
+    // 停止 WiFi
+    ESP_LOGI(TAG, "Stopping WiFi driver...");
+    esp_wifi_stop();
+    vTaskDelay(pdMS_TO_TICKS(2000));  // 等待停止完成
     
     // 使用新設定重新啟動
+    ESP_LOGI(TAG, "Configuring WiFi with new settings...");
     wifi_config_t wifi_config = {0};
     strcpy((char*)wifi_config.sta.ssid, g_device_config.wifi_ssid);
     strcpy((char*)wifi_config.sta.password, g_device_config.wifi_password);
@@ -109,9 +113,15 @@ void wifi_reconnect_with_new_config(void) {
     wifi_config.sta.pmf_cfg.required = false;
     
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
+    
+    // 套用 IP 設定
+    wifi_apply_ip_config();
+    
+    // 啟動 WiFi
+    ESP_LOGI(TAG, "Starting WiFi with SSID: %s", g_device_config.wifi_ssid);
     ESP_ERROR_CHECK(esp_wifi_start());
     
-    ESP_LOGI(TAG, "WiFi reconnection started with SSID: %s", g_device_config.wifi_ssid);
+    ESP_LOGI(TAG, "=== WiFi reconnection initiated ===");
 }
 
 // WiFi 事件處理函式 - 加強錯誤處理
@@ -163,7 +173,7 @@ void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id
         
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
-        ESP_LOGI(TAG, "WiFi connected successfully!");
+        ESP_LOGI(TAG, "✅ WiFi connected successfully!");
         ESP_LOGI(TAG, "Got IP: " IPSTR, IP2STR(&event->ip_info.ip));
         ESP_LOGI(TAG, "Gateway: " IPSTR, IP2STR(&event->ip_info.gw));
         ESP_LOGI(TAG, "Netmask: " IPSTR, IP2STR(&event->ip_info.netmask));
