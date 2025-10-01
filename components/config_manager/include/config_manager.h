@@ -37,7 +37,7 @@ esp_err_t config_init(void);
 esp_err_t config_save(void);
 esp_err_t config_load(void);
 esp_err_t config_reset_to_default(void);
-
+void config_set_default_values(void);
 // 設定更新函式
 esp_err_t config_update_wifi_from_json(const char* json_str);
 esp_err_t config_update_ip_from_json(const char* json_str);

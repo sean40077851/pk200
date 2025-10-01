@@ -68,14 +68,7 @@ void system_monitor_task(void *pvParameters) {
 void app_main(void) {
     ESP_LOGI(TAG, "=== Starting PK200 LCD Application ===");
 
-    // Initialize NVS (移到最前面，因為設定管理需要)
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
-    ESP_LOGI(TAG, "NVS initialized successfully");
+
 
     // Initialize WiFi (包含設定管理初始化)
     wifi_init();
