@@ -14,7 +14,7 @@
 static esp_netif_t *sta_netif = NULL;
 static bool wifi_connected = false;
 static int retry_count = 0;
-static const int max_retry = 5;
+static const int max_retry = 3;
 
 // 外部函數聲明
 extern void mqtt_init(void);
@@ -166,6 +166,9 @@ void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id
             ESP_LOGE(TAG, "  SSID: %s", g_device_config.wifi_ssid);
             ESP_LOGE(TAG, "  Password: %s", strlen(g_device_config.wifi_password) > 0 ? "***SET***" : "***EMPTY***");
             ESP_LOGE(TAG, "Waiting 30 seconds before next attempt...");
+            config_reset_to_default(); // 重設為預設值
+            wifi_reconnect_with_new_config(); // 使用預設值重連
+            
             vTaskDelay(pdMS_TO_TICKS(30000));
             retry_count = 0;  // 重設重試計數
             esp_wifi_connect();
@@ -173,7 +176,7 @@ void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id
         
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
-        ESP_LOGI(TAG, "✅ WiFi connected successfully!");
+        ESP_LOGI(TAG, "WiFi connected successfully!");
         ESP_LOGI(TAG, "Got IP: " IPSTR, IP2STR(&event->ip_info.ip));
         ESP_LOGI(TAG, "Gateway: " IPSTR, IP2STR(&event->ip_info.gw));
         ESP_LOGI(TAG, "Netmask: " IPSTR, IP2STR(&event->ip_info.netmask));

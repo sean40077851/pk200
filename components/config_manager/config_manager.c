@@ -15,10 +15,10 @@
 device_config_t g_device_config;
 
 // 設定預設值
-static void config_set_default_values(void) {
+void config_set_default_values(void) {
     // 預設 WiFi 設定
-    strcpy(g_device_config.wifi_ssid, "A100");
-    
+    strcpy(g_device_config.wifi_ssid, "A100P");
+    strcpy(g_device_config.wifi_password, "12345678");
     
     // 預設 IP 設定 (ip_mode=2 表示預設)
     g_device_config.ip_mode = 2;
@@ -39,6 +39,7 @@ static void config_set_default_values(void) {
     
     g_device_config.config_loaded = false;
     ESP_LOGI(TAG, "Default config loaded, MAC: %s", g_device_config.device_mac);
+    ESP_LOGI("WIFI", "WIFI SSID, MAC: %s", g_device_config.wifi_ssid);
     
 }
 
@@ -71,17 +72,21 @@ const char* config_get_firmware_version(void) {
 esp_err_t config_init(void) {
     ESP_LOGI(TAG, "Initializing config manager");
     
-    // 嘗試從 NVS 載入設定
     esp_err_t ret = config_load();
     if (ret != ESP_OK) {
         ESP_LOGW(TAG, "Failed to load config from NVS, using defaults");
         config_set_default_values();
-        // 儲存預設設定
         config_save();
-    } else {
+    }
+        // 新增：檢查 SSID 是否為空
+    if (strlen(g_device_config.wifi_ssid) == 0) {
+        ESP_LOGW(TAG, "SSID is empty, resetting to defaults");
+        config_set_default_values();
+        config_save();
+    }
         ESP_LOGI(TAG, "Config loaded from NVS successfully");
         g_device_config.config_loaded = true;
-    }
+    
     
     return ESP_OK;
 }
@@ -137,7 +142,16 @@ esp_err_t config_load(void) {
 // 重設為預設值
 esp_err_t config_reset_to_default(void) {
     ESP_LOGI(TAG, "Resetting config to defaults");
+
+    // 清空整個結構體，避免殘留舊資料
+    memset(&g_device_config, 0, sizeof(g_device_config));
+
+    // 設定預設值 (SSID、密碼、MQTT host 等)
     config_set_default_values();
+
+    // 標記狀態
+    g_device_config.config_loaded = false;  // 表示目前是預設設定
+    // 儲存到 NVS
     return config_save();
 }
 
@@ -160,8 +174,13 @@ esp_err_t config_update_mqtt_from_json(const char* json_str) {
     
     cJSON *wifi_pwd = cJSON_GetObjectItem(json, "wifi_pwd");
     if (cJSON_IsString(wifi_pwd)) {
-        strncpy(g_device_config.wifi_password, wifi_pwd->valuestring ? wifi_pwd->valuestring : "", 
-                sizeof(g_device_config.wifi_password) - 1);
+        if (wifi_pwd->valuestring && strlen(wifi_pwd->valuestring) > 0) {
+            strncpy(g_device_config.wifi_password, wifi_pwd->valuestring,
+                    sizeof(g_device_config.wifi_password) - 1);
+        } else {
+            // 確保清空密碼
+            g_device_config.wifi_password[0] = '\0';
+        }
         g_device_config.wifi_password[sizeof(g_device_config.wifi_password) - 1] = '\0';
         ESP_LOGI(TAG, "Updated WiFi password");
     }
