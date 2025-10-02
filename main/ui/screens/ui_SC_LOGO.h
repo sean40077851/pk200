@@ -13,7 +13,8 @@ extern lv_obj_t * ui_Lab_Ver;
 extern lv_obj_t * ui_Image2;
 extern lv_obj_t * ui_Panel1;
 extern lv_obj_t * ui_Label177;
-extern lv_obj_t * ui_Label2;
+extern lv_obj_t * ui_logoLabel2;
+extern lv_obj_t * ui_Label3;
 
 // CUSTOM VARIABLES
 
