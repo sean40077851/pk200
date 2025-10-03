@@ -13,7 +13,7 @@ lv_obj_t * ui_Lab_Ver =NULL;      // 版本標籤物件
 lv_obj_t * ui_Panel1 =NULL;       // 面板物件
 lv_obj_t * ui_phonewenti =NULL;     // 版本文字標籤物件
 lv_obj_t * ui_logoLabel2 =NULL;    // 標題標籤物件
-lv_obj_t * ui_Label3 =NULL;
+
 // LOGO畫面初始化函數
 void ui_SC_LOGO_screen_init(void)
 {
@@ -63,15 +63,5 @@ void ui_SC_LOGO_screen_init(void)
     lv_obj_add_flag(ui_phonewenti, LV_OBJ_FLAG_ADV_HITTEST); // 進階點擊測試
     lv_obj_clear_flag(ui_phonewenti, LV_OBJ_FLAG_SCROLLABLE); // 取消可捲動
 
-    ui_Label3 = lv_label_create(ui_SC_LOGO);         // 建立標題標籤
-    lv_obj_set_width(ui_Label3, LV_SIZE_CONTENT);    // 寬度自適應
-    lv_obj_set_height(ui_Label3, LV_SIZE_CONTENT);   // 高度自適應
-    lv_obj_set_x(ui_Label3, 120);                    // X座標-53
-    lv_obj_set_y(ui_Label3, -130);                     // Y座標36
-    lv_obj_set_align(ui_Label3, LV_ALIGN_CENTER);    // 置中對齊
-    lv_label_set_text(ui_Label3, g_device_config.device_mac); // 設定標題文字
-    lv_obj_set_style_text_color(ui_Label3, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT); // 文字顏色黑
-    lv_obj_set_style_text_opa(ui_Label3, 255, LV_PART_MAIN | LV_STATE_DEFAULT); // 文字不透明
-    lv_obj_set_style_text_font(ui_Label3,&lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT); // 設定字體
 
 }

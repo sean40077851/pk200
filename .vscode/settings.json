@@ -20,6 +20,7 @@
     "esp_lcd_panel_commands.h": "c",
     "esp_log.h": "c",
     "my_mqtt.h": "c",
-    "esp_system.h": "c"
+    "esp_system.h": "c",
+    "config_manager.h": "c"
   }
 }

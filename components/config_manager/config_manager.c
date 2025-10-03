@@ -9,7 +9,7 @@
 #define TAG "CONFIG"
 #define NVS_NAMESPACE "device_config"
 #define CONFIG_KEY "config_data"
-#define FW_VERSION "FRSP-03-wentai-029CH"
+#define FW_VERSION "PK200-wentai-v0.6.1"
 
 // 全域設定變數
 device_config_t g_device_config;
@@ -17,8 +17,8 @@ device_config_t g_device_config;
 // 設定預設值
 void config_set_default_values(void) {
     // 預設 WiFi 設定
-    strcpy(g_device_config.wifi_ssid, "A100P");
-    strcpy(g_device_config.wifi_password, "12345678");
+    strcpy(g_device_config.wifi_ssid,"A100");
+    //strcpy(g_device_config.wifi_password, "12345678");
     
     // 預設 IP 設定 (ip_mode=2 表示預設)
     g_device_config.ip_mode = 2;

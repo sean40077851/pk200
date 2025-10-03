@@ -15,10 +15,12 @@ SET(SOURCES components/ui_comp_button.c
     screens/ui_Charging.c
     screens/ui_End.c
     screens/ui_menu.c
+    screens/ui_ver.c
     ui.c
     components/ui_comp_hook.c
     ui_helpers.c
     images/timemenu.c
+    images/ver.c
     images/logo.c
     images/back.c
     images/menuicon.c
