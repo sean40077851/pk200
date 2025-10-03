@@ -1,49 +1,25 @@
 {
-  "idf.portWin": "COM19",
-  "idf.adapterTargetName": "esp32s3",
-  "idf.customExtraPaths": "D:\\Espressif\\tools\\xtensa-esp-elf\\esp-14.2.0_20241119\\xtensa-esp-elf\\bin;D:\\Espressif\\tools\\esp32ulp-elf\\2.35_20220830\\esp32ulp-elf\\bin;D:\\Espressif\\tools\\cmake\\3.24.0\\bin;D:\\Espressif\\tools\\openocd-esp32\\v0.12.0-esp32-20240318\\openocd-esp32\\bin;D:\\Espressif\\tools\\ninja\\1.12.1;D:\\Espressif\\tools\\idf-exe\\1.0.3;D:\\Espressif\\tools\\ccache\\4.8\\ccache-4.8-windows-x86_64;D:\\Espressif\\tools\\dfu-util\\0.11\\dfu-util-0.11-win64;D:\\Espressif\\tools\\esp-rom-elfs\\20230320",
-  "idf.customExtraVars": {
-    "OPENOCD_SCRIPTS": "D:\\Espressif\\tools\\openocd-esp32\\v0.12.0-esp32-20240318\\openocd-esp32\\share\\openocd\\scripts",
-    "IDF_CCACHE_ENABLE": "1",
-    "ESP_ROM_ELF_DIR": "D:\\Espressif\\tools\\esp-rom-elfs\\20230320"
-  },
-  "idf.espIdfPath": "D:\\Espressif\\frameworks\\esp-idf-v5.4.2",
-  "idf.pythonBinPath": "D:\\Espressif\\python_env\\idf5.4_py3.11_env\\Scripts\\python.exe",
-  "idf.toolsPath": "D:\\Espressif",
-  "idf.gitPath": "D:\\Espressif\\tools\\idf-git\\2.44.0\\cmd\\git.exe",
-  "C_Cpp.intelliSenseEngine": "Tag Parser",
-  "idf.enableIdfComponentManager": false,
-  "files.associations": {
-    "*.h": "c",
-    "*.c": "c",
-    "ui_SC_LOGO.C": "cpp"
-  },
-  "C_Cpp.default.compilerPath": "D:\\Espressif\\tools\\xtensa-esp-elf\\esp-14.2.0_20241119\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe",
-  "C_Cpp.default.cStandard": "c17",
-  "C_Cpp.default.cppStandard": "c++17",
-  "C_Cpp.default.includePath": [
-    "${workspaceFolder}/**",
-    "D:/Espressif/frameworks/esp-idf-v5.4.2/components/**",
-    "${workspaceFolder}/components/**",
-    "${workspaceFolder}/main/**"
-  ],
-  "C_Cpp.default.defines": [
-    "ESP_PLATFORM",
-    "IDF_VER=\"v5.4.2\"",
-    "SOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE",
-    "SOC_XTAL_FREQ_MHZ=CONFIG_XTAL_FREQ"
-  ],
-  "clangd.path": "D:\\Espressif\\tools\\esp-clang\\esp-18.1.2_20240912\\esp-clang\\bin\\clangd.exe",
-  "clangd.arguments": [
-    "--background-index",
-    "--query-driver=D:\\Espressif\\tools\\xtensa-esp-elf\\esp-14.2.0_20241119\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe",
-    "--compile-commands-dir=d:\\ESP-Project\\PK200_LCD_ESP-IDF\\build"
-  ],
-  "idf.espIdfPathWin": "d:\\Espressif\\frameworks\\esp-idf-v5.4.2",
-  "idf.toolsPathWin": "d:\\Espressif\\tools",
-  "idf.pythonInstallPath": "d:\\Espressif\\tools\\tools\\idf-python\\3.11.2\\python.exe",
-  "idf.flashType": "UART",
+  "C_Cpp.intelliSenseEngine": "default",
+  "idf.espIdfPathWin": "C:\\Users\\sean.wang\\esp\\v5.2.5\\esp-idf",
+  "idf.pythonInstallPath": "c:\\Users\\sean.wang\\.espressif\\tools\\idf-python\\3.11.2\\python.exe",
   "idf.openOcdConfigs": [
     "board/esp32s3-builtin.cfg"
-  ]
+  ],
+  "idf.toolsPathWin": "c:\\Users\\sean.wang\\.espressif",
+  "idf.customExtraVars": {
+    "IDF_TARGET": "esp32s3"
+  },
+  "clangd.path": "c:\\Users\\sean.wang\\.espressif\\tools\\esp-clang\\16.0.1-fe4f10a809\\esp-clang\\bin\\clangd.exe",
+  "clangd.arguments": [
+    "--background-index",
+    "--query-driver=c:\\Users\\sean.wang\\.espressif\\tools\\xtensa-esp-elf\\esp-13.2.0_20230928\\xtensa-esp-elf\\bin\\xtensa-esp32s3-elf-gcc.exe",
+    "--compile-commands-dir=${workspaceFolder}\\build"
+  ],
+  "files.associations": {
+    "esp_io_expander_tca95xx_16bit.h": "c",
+    "esp_lcd_panel_commands.h": "c",
+    "esp_log.h": "c",
+    "my_mqtt.h": "c",
+    "esp_system.h": "c"
+  }
 }
