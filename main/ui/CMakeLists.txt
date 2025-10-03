@@ -14,9 +14,11 @@ SET(SOURCES components/ui_comp_button.c
     screens/ui_Welcome.c
     screens/ui_Charging.c
     screens/ui_End.c
+    screens/ui_menu.c
     ui.c
     components/ui_comp_hook.c
     ui_helpers.c
+    images/timemenu.c
     images/logo.c
     images/back.c
     images/menuicon.c

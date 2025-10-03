@@ -27,6 +27,7 @@ extern "C" {
 #include "screens/ui_Welcome.h"
 #include "screens/ui_Charging.h"
 #include "screens/ui_End.h"
+#include "screens/ui_menu.h"
 
 ///////////////////// VARIABLES ////////////////////
 
@@ -54,6 +55,7 @@ extern lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
 LV_IMG_DECLARE(logo);
+LV_IMG_DECLARE(timemenu);
 LV_IMG_DECLARE(back);
 LV_IMG_DECLARE(menuicon);
 LV_IMG_DECLARE(OnLight);

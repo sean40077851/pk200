@@ -47,7 +47,7 @@ void ui_event_menu_icon(lv_event_t * e)      // 菜單圖標事件處理函數
     lv_event_code_t event_code = lv_event_get_code(e);  // 獲取事件代碼
 
     if(event_code == LV_EVENT_CLICKED) {                // 如果是點擊事件
-       _ui_screen_change(&ui_Step2, LV_SCR_LOAD_ANIM_FADE_ON, 0, 0, &ui_Step2_screen_init);  // 切換到Step1畫面並淡入效果
+       _ui_screen_change(&scr_menu, LV_SCR_LOAD_ANIM_FADE_ON, 0, 0, &ui_menu_screen_init);  // 切換到Step1畫面並淡入效果
     }
 }
 void ui_time_tick_task(lv_timer_t * t) {

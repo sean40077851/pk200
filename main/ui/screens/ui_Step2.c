@@ -58,7 +58,7 @@ void enter_btn_event(lv_event_t * e)
 // 返回鍵事件
 void back_btn_event(lv_event_t * e)
 {
-    lv_scr_load(ui_Home);  
+    lv_scr_load(scr_menu);  
 }
 void clear_btn_event(lv_event_t * e)
 {
