@@ -2,7 +2,7 @@
 #define WIFI_H
 
 #include <stdbool.h>
-
+#include "esp_event_base.h"
 // WiFi 初始化
 void wifi_init(void);
 
@@ -20,6 +20,7 @@ void wifi_apply_ip_config(void);
 
 // 手動套用新的 IP 設定（由 MQTT 呼叫）
 void wifi_apply_new_ip_config(void);
+const char *wifi_get_connected_ssid(void);
 
 // WiFi 事件處理函式
 void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);

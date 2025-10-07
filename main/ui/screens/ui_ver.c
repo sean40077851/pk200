@@ -1,5 +1,7 @@
 #include "../ui.h"
 #include "../../../components/config_manager/include/config_manager.h"
+#include "../../../components/wifi/include/wifi.h"
+
 
 lv_obj_t *ver_info = NULL;
 lv_obj_t *title = NULL;
@@ -22,9 +24,18 @@ void ui_ver_update_info(void)
     if (label_mac)
         lv_label_set_text_fmt(label_mac, "MAC ID: %s", g_device_config.device_mac);
 
-    if (label_wifi)
-        lv_label_set_text_fmt(label_wifi, "WiFi: %s", g_device_config.wifi_ssid);
-
+    if (label_wifi) {
+        bool wifi_connected = wifi_is_connected();
+        const char *status_symbol = wifi_connected ? LV_SYMBOL_OK : LV_SYMBOL_CLOSE;
+        const char *active_ssid = wifi_get_connected_ssid();
+        const char *display_ssid = (wifi_connected && active_ssid && active_ssid[0] != '\0')
+                                       ? active_ssid
+                                       : g_device_config.wifi_ssid;
+        lv_label_set_text_fmt(label_wifi, "WiFi: %s %s", display_ssid, status_symbol);
+        lv_obj_set_style_text_color(label_wifi,
+                                    wifi_connected ? lv_color_hex(0x4CAF50) : lv_color_hex(0xF44336),
+                                    0);
+    }
     if (label_ip) {
         // 根據 ip_mode 決定要顯示哪個 IP
         if (g_device_config.ip_mode == 0)
@@ -130,5 +141,6 @@ void ui_ver_screen_init(void)
     lv_obj_clear_flag(label_back, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_event_cb(label_back, back_btn_event, LV_EVENT_CLICKED, NULL);
 
+    ui_ver_update_info();       // 初始化顯示資訊（含 WiFi 狀態）
     ui_ver_start_auto_update(); // 啟動自動更新
 }

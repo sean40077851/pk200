@@ -13,6 +13,7 @@
 #define TAG "WIFI"
 static esp_netif_t *sta_netif = NULL;
 static bool wifi_connected = false;
+static char current_connected_ssid[33] = "";
 static int retry_count = 0;
 static const int max_retry = 3;
 
@@ -130,9 +131,20 @@ void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id
         ESP_LOGI(TAG, "WiFi STA started, connecting to SSID: %s", g_device_config.wifi_ssid);
         esp_wifi_connect();
         
-    } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
+    } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_CONNECTED) {
+        wifi_event_sta_connected_t *connected = (wifi_event_sta_connected_t *) event_data;
+        size_t copy_len = connected->ssid_len;
+        if (copy_len >= sizeof(current_connected_ssid)) {
+            copy_len = sizeof(current_connected_ssid) - 1;
+        }
+        memcpy(current_connected_ssid, connected->ssid, copy_len);
+        current_connected_ssid[copy_len] = '\0';
+        ESP_LOGI(TAG, "Connected to AP: %s", current_connected_ssid);
+
+    }else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
         wifi_event_sta_disconnected_t* disconnected = (wifi_event_sta_disconnected_t*) event_data;
         wifi_connected = false;
+        current_connected_ssid[0] = '\0';
         
         ESP_LOGW(TAG, "WiFi disconnected, reason: %d", disconnected->reason);
         
@@ -187,6 +199,16 @@ void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id
         config_set_current_ip(ip_str);
         
         wifi_connected = true;
+        wifi_ap_record_t ap_info;
+        if (esp_wifi_sta_get_ap_info(&ap_info) == ESP_OK) {
+            size_t copy_len = strnlen((const char *) ap_info.ssid, sizeof(ap_info.ssid));
+            if (copy_len >= sizeof(current_connected_ssid)) {
+                copy_len = sizeof(current_connected_ssid) - 1;
+            }
+            memcpy(current_connected_ssid, ap_info.ssid, copy_len);
+            current_connected_ssid[copy_len] = '\0';
+            ESP_LOGI(TAG, "Confirmed AP SSID: %s", current_connected_ssid);
+        }
         retry_count = 0;  // 重設重試計數
         
         // 初始化 SNTP
@@ -199,6 +221,7 @@ void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_LOST_IP) {
         ESP_LOGW(TAG, "Lost IP address");
         wifi_connected = false;
+        current_connected_ssid[0] = '\0';
     }
 }
 
@@ -287,6 +310,9 @@ void wifi_init(void) {
 // 檢查 WiFi 連線狀態
 bool wifi_is_connected(void) {
     return wifi_connected;
+}
+const char *wifi_get_connected_ssid(void) {
+    return current_connected_ssid;
 }
 
 // 取得目前 IP 地址
