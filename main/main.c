@@ -68,8 +68,9 @@ void system_monitor_task(void *pvParameters) {
 void app_main(void) {
     ESP_LOGI(TAG, "=== Starting PK200 LCD Application ===");
 
-
-
+    /*nvs_flash_erase();   // 清除所有儲存的資料（包括 WiFi、MQTT、config）
+    nvs_flash_init();    // 重新初始化 NVS
+    */
     // Initialize WiFi (包含設定管理初始化)
     wifi_init();
     ESP_LOGI(TAG, "WiFi initialized with SSID: %s", g_device_config.wifi_ssid);
