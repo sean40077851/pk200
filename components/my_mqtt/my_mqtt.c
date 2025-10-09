@@ -1,117 +1,135 @@
 #include <stdio.h>
+#include <string.h>
 #include "mqtt_client.h"
 #include "esp_log.h"
+#include "esp_system.h"
 #include "my_mqtt.h"
 #include "config_manager.h"
-#include "esp_system.h"
-#include <string.h>
+#include "wifi.h"
+#include "ota.h"
 
 #define TAG "MQTT"
-
 esp_mqtt_client_handle_t mqtt_handle = NULL;
 static bool mqtt_connected = false;
-static bool mqtt_need_reconnect = false;  // 新增：重連標記
-static char device_topic[64];        // WE1/{MAC}
-static char mqttset_topic[64];       // WE1/{MAC}/MQTTset  
-static char wifiset_topic[64];       // WE1/{MAC}/WIFIset
+static bool mqtt_need_reconnect = false;
 
-// 外部函數聲明
+static char device_topic[64];    // WE1/{MAC}
+static char mqttset_topic[64];   // WE1/{MAC}/MQTTset
+static char wifiset_topic[64];   // WE1/{MAC}/WIFIset
+static char ota_status_topic[64]; // WE1/{MAC}/OTA/status
+static const char *ota_set_topic = "wi485update"; // 共用 OTA 訂閱 topic
+
 extern void wifi_reconnect_with_new_config(void);
 extern void wifi_apply_ip_config(void);
 extern bool wifi_is_connected(void);
 
-// 發佈 WiFi 資訊 (協議要求)
-static void mqtt_publish_wifi_info(void) {
+// OTA 狀態回呼（MQTT 發佈）
+static void ota_status_mqtt_callback(ota_status_t status, esp_err_t error)
+{
     if (!mqtt_connected || !mqtt_handle) return;
-    
+
+    const char *status_str = "unknown";
+    switch (status) {
+        case OTA_STATUS_IN_PROGRESS: status_str = "ota_started"; break;
+        case OTA_STATUS_SUCCESS:     status_str = "ota_success"; break;
+        case OTA_STATUS_FAILED:      status_str = "ota_failed";  break;
+        default: break;
+    }
+
+    char payload[256];
+    if (status == OTA_STATUS_FAILED) {
+        snprintf(payload, sizeof(payload),
+                 "{\"mac\":\"%s\",\"status\":\"%s\",\"error\":\"%s\"}",
+                 g_device_config.device_mac, status_str, esp_err_to_name(error));
+    } else {
+        snprintf(payload, sizeof(payload),
+                 "{\"mac\":\"%s\",\"status\":\"%s\"}",
+                 g_device_config.device_mac, status_str);
+    }
+
+    esp_mqtt_client_publish(mqtt_handle, ota_status_topic, payload, 0, 1, 0);
+    ESP_LOGI(TAG, "OTA status published: %s", payload);
+}
+
+// 發佈 Wi-Fi 資訊
+static void mqtt_publish_wifi_info(void)
+{
+    if (!mqtt_connected || !mqtt_handle) return;
+
     char payload[512];
     snprintf(payload, sizeof(payload),
-             "{"
-             "\"mac\":\"%s\","
-             "\"FWVer\":\"%s\","
-             "\"ip_mode\":\"%d\","
-             "\"ip\":\"%s\","
-             "\"gateway\":\"%s\","
-             "\"subnet\":\"%s\""
-             "}",
+             "{\"mac\":\"%s\",\"FWVer\":\"%s\",\"ip_mode\":\"%d\","
+             "\"ip\":\"%s\",\"gateway\":\"%s\",\"subnet\":\"%s\"}",
              g_device_config.device_mac,
              g_device_config.fw_version,
              g_device_config.ip_mode,
              g_device_config.current_ip,
              g_device_config.gateway,
              g_device_config.subnet);
-    
+
     esp_mqtt_client_publish(mqtt_handle, "WE1/WIFIinfo", payload, 0, 1, 0);
-    ESP_LOGI(TAG, "Published WiFi info: %s", payload);
+    ESP_LOGI(TAG, "Published WiFi info");
 }
 
-// 發佈 MQTT 資訊 (協議要求)
-static void mqtt_publish_mqtt_info(void) {
+// 發佈 MQTT 資訊
+static void mqtt_publish_mqtt_info(void)
+{
     if (!mqtt_connected || !mqtt_handle) return;
-    
+
     char payload[512];
     snprintf(payload, sizeof(payload),
-             "{"
-             "\"mac\":\"%s\","
-             "\"ssid\":\"%s\","
-             "\"wifi_pwd\":\"%s\","
-             "\"host\":\"%s\","
-             "\"port\":\"%d\","
-             "\"user\":\"%s\""
-             "}",
+             "{\"mac\":\"%s\",\"ssid\":\"%s\",\"wifi_pwd\":\"%s\","
+             "\"host\":\"%s\",\"port\":\"%d\",\"user\":\"%s\"}",
              g_device_config.device_mac,
              g_device_config.wifi_ssid,
              g_device_config.wifi_password,
              g_device_config.mqtt_host,
              g_device_config.mqtt_port,
              g_device_config.mqtt_username);
-    
+
     esp_mqtt_client_publish(mqtt_handle, "WE1/MQTTinfo", payload, 0, 1, 0);
     ESP_LOGI(TAG, "Published MQTT info");
 }
 
-// 處理設定指令
-static void handle_set_command(int set_value) {
+// set 指令處理
+static void handle_set_command(int set_value)
+{
     ESP_LOGI(TAG, "Received set command: %d", set_value);
-    
+
     switch (set_value) {
-        case 3:  // 裝置重開指令
-            ESP_LOGI(TAG, "Device restart command received, restarting in 2 seconds...");
-            // 先發送確認訊息
+        case 3:
+            ESP_LOGI(TAG, "Restarting device...");
             if (mqtt_connected && mqtt_handle) {
-                char ack_msg[64];
-                snprintf(ack_msg, sizeof(ack_msg), "{\"status\":\"restarting\",\"mac\":\"%s\"}", 
+                char ack[128];
+                snprintf(ack, sizeof(ack), "{\"status\":\"restarting\",\"mac\":\"%s\"}",
                          g_device_config.device_mac);
-                esp_mqtt_client_publish(mqtt_handle, device_topic, ack_msg, 0, 0, 0);
+                esp_mqtt_client_publish(mqtt_handle, device_topic, ack, 0, 0, 0);
             }
-            vTaskDelay(pdMS_TO_TICKS(2000)); // 延遲2秒讓回應送出
+            vTaskDelay(pdMS_TO_TICKS(2000));
             esp_restart();
             break;
-            
-        case 7:  // 設定 MQTT (會配合 MQTTset topic)
-            ESP_LOGI(TAG, "MQTT setup mode activated - waiting for MQTTset data");
-            // 實際處理在 MQTTset topic 中
+
+        case 7:
+            ESP_LOGI(TAG, "MQTT setup mode - waiting for MQTTset data");
             break;
-            
-        case 8:  // 讀取 WiFi 及 MQTT 資訊
-            ESP_LOGI(TAG, "Sending WiFi and MQTT info");
+
+        case 8:
+            ESP_LOGI(TAG, "Sending WiFi & MQTT info...");
             vTaskDelay(pdMS_TO_TICKS(100));  // 短暫延遲避免訊息擁塞
             mqtt_publish_wifi_info();
             vTaskDelay(pdMS_TO_TICKS(100));
             mqtt_publish_mqtt_info();
             break;
-            
-        case 9:  // 設定 IP (會配合 WIFIset topic)
-            ESP_LOGI(TAG, "WiFi IP setup mode activated - waiting for WIFIset data");
-            // 實際處理在 WIFIset topic 中
+
+        case 9:
+            ESP_LOGI(TAG, "WiFi IP setup mode - waiting for WIFIset data");
             break;
-            
+
         default:
             ESP_LOGW(TAG, "Unknown set command: %d", set_value);
             break;
     }
 }
-
 // 處理 MQTTset 訊息
 static void handle_mqttset_command(const char* data, int data_len) {
     char json_buffer[512];
@@ -186,131 +204,130 @@ static void handle_wifiset_command(const char* data, int data_len) {
     }
 }
 
-void mqtt_event_callback(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data) {
+// MQTT 訊息事件
+void mqtt_event_callback(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
+{
     esp_mqtt_event_handle_t event = (esp_mqtt_event_handle_t) event_data;
-    
+
     switch ((esp_mqtt_event_id_t)event_id) {
         case MQTT_EVENT_CONNECTED:
-            ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
             mqtt_connected = true;
-            
-            // 訂閱控制 topics
+            ESP_LOGI(TAG, "MQTT connected!");
+
             esp_mqtt_client_subscribe(mqtt_handle, device_topic, 1);
             esp_mqtt_client_subscribe(mqtt_handle, mqttset_topic, 1);
             esp_mqtt_client_subscribe(mqtt_handle, wifiset_topic, 1);
-            
-            ESP_LOGI(TAG, "Subscribed to topics:");
-            ESP_LOGI(TAG, "  - %s", device_topic);
-            ESP_LOGI(TAG, "  - %s", mqttset_topic);
-            ESP_LOGI(TAG, "  - %s", wifiset_topic);
-            
-            // 發佈初始資訊 (協議要求)
+            esp_mqtt_client_subscribe(mqtt_handle, ota_set_topic, 1);
+
             mqtt_publish_wifi_info();
             mqtt_publish_mqtt_info();
+
+            ESP_LOGI(TAG, "Subscribed: %s, %s, %s, %s",
+                     device_topic, mqttset_topic, wifiset_topic, ota_set_topic);
             break;
-            
+
         case MQTT_EVENT_DISCONNECTED:
-            ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
             mqtt_connected = false;
+            ESP_LOGI(TAG, "MQTT disconnected");
             break;
-            
-        case MQTT_EVENT_SUBSCRIBED:
-            ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
-            break;
-            
-        case MQTT_EVENT_UNSUBSCRIBED:
-            ESP_LOGI(TAG, "MQTT_EVENT_UNSUBSCRIBED, msg_id=%d", event->msg_id);
-            break;
-            
-        case MQTT_EVENT_PUBLISHED:
-            ESP_LOGI(TAG, "MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
-            break;
-            
+
         case MQTT_EVENT_DATA:
-            ESP_LOGI(TAG, "MQTT_EVENT_DATA");
-            printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
-            printf("DATA=%.*s\r\n", event->data_len, event->data);
-            
-            // 處理主控制 topic (WE1/{MAC})
-            if (strncmp(event->topic, device_topic, event->topic_len) == 0) {
-                // 解析 set 指令
-                char json_buffer[128];
-                if (event->data_len < sizeof(json_buffer)) {
-                    memcpy(json_buffer, event->data, event->data_len);
-                    json_buffer[event->data_len] = '\0';
-                    
-                    // 簡單的 JSON 解析找 set 值
-                    char* set_ptr = strstr(json_buffer, "\"set\":");
-                    if (set_ptr) {
-                        int set_value = atoi(set_ptr + 6);
-                        handle_set_command(set_value);
-                    }
-                }
+    ESP_LOGI(TAG, "MQTT_EVENT_DATA");
+    printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
+    printf("DATA=%.*s\r\n", event->data_len, event->data);
+
+    // 先處理共用 OTA topic
+    if (strncmp(event->topic,ota_set_topic, event->topic_len) == 0) {
+    char json_buffer[256];
+    memcpy(json_buffer, event->data, event->data_len);
+    json_buffer[event->data_len] = '\0';
+    ESP_LOGI(TAG, "OTA JSON received: %s", json_buffer);
+
+    char *url_start = strstr(json_buffer, "\"url\"");
+    if (url_start) {
+        url_start = strchr(url_start, ':');
+        if (url_start) {
+            // 跳過 ": " 和引號
+            while (*url_start && (*url_start == ':' || *url_start == ' ' || *url_start == '\"'))
+                url_start++;
+            char *url_end = strchr(url_start, '\"');
+            if (url_end) {
+                char ota_url[256];
+                int len = url_end - url_start;
+                if (len >= sizeof(ota_url))
+                    len = sizeof(ota_url) - 1;
+                strncpy(ota_url, url_start, len);
+                ota_url[len] = '\0';
+                ESP_LOGI(TAG, "Starting OTA from: %s", ota_url);
+
+                esp_err_t ret = ota_start_async(ota_url);
+                if (ret == ESP_OK)
+                    ESP_LOGI(TAG, "OTA started successfully");
+                else
+                    ESP_LOGE(TAG, "OTA start failed: %s", esp_err_to_name(ret));
+              }
+         }
+        }
+    }
+    // 處理主控制 topic (WE1/{MAC})1
+    else if (strncmp(event->topic, device_topic, event->topic_len) == 0) {
+        char json_buffer[128];
+        if (event->data_len < sizeof(json_buffer)) {
+            memcpy(json_buffer, event->data, event->data_len);
+            json_buffer[event->data_len] = '\0';
+            char* set_ptr = strstr(json_buffer, "\"set\":");
+            if (set_ptr) {
+                int set_value = atoi(set_ptr + 6);
+                handle_set_command(set_value);
             }
-            // 處理 MQTTset topic
-            else if (strncmp(event->topic, mqttset_topic, event->topic_len) == 0) {
-                handle_mqttset_command(event->data, event->data_len);
-            }
-            // 處理 WIFIset topic  
-            else if (strncmp(event->topic, wifiset_topic, event->topic_len) == 0) {
-                handle_wifiset_command(event->data, event->data_len);
-            }
-            break;
-            
-        case MQTT_EVENT_ERROR:
-            ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
-            break;
-            
-        default:
-            ESP_LOGI(TAG, "Other event id:%d", event->event_id);
+        }
+    }
+    // 處理 MQTTset topic
+    else if (strncmp(event->topic, mqttset_topic, event->topic_len) == 0) {
+        handle_mqttset_command(event->data, event->data_len);
+    }
+    // 處理 WIFIset topic  
+    else if (strncmp(event->topic, wifiset_topic, event->topic_len) == 0) {
+        handle_wifiset_command(event->data, event->data_len);
+    }
+    break;
+    default:
             break;
     }
 }
 
-void mqtt_init(void) {
+// 初始化 MQTT
+void mqtt_init(void)
+{
     if (!wifi_is_connected()) {
-        ESP_LOGW(TAG, "WiFi not connected, skipping MQTT initialization");
+        ESP_LOGW(TAG, "WiFi not connected, skip MQTT init");
         return;
     }
-    
-    // 生成 topics
+
     config_get_device_topic(device_topic, sizeof(device_topic));
     config_get_mqttset_topic(mqttset_topic, sizeof(mqttset_topic));
     config_get_wifiset_topic(wifiset_topic, sizeof(wifiset_topic));
-    
-    ESP_LOGI(TAG, "Initializing MQTT with host: %s:%d", 
-             g_device_config.mqtt_host, g_device_config.mqtt_port);
-    ESP_LOGI(TAG, "Device MAC: %s", g_device_config.device_mac);
-    
-    // 建立 MQTT URI
+    snprintf(ota_status_topic, sizeof(ota_status_topic), "WE1/%s/OTA/status", g_device_config.device_mac);
+
+    ota_register_status_callback(ota_status_mqtt_callback);
+
     char mqtt_uri[256];
     snprintf(mqtt_uri, sizeof(mqtt_uri), "mqtt://%s", g_device_config.mqtt_host);
-    
-    esp_mqtt_client_config_t mqtt_cfg = {
+
+    esp_mqtt_client_config_t cfg = {
         .broker.address.uri = mqtt_uri,
         .broker.address.port = g_device_config.mqtt_port,
         .credentials.username = g_device_config.mqtt_username,
         .credentials.authentication.password = g_device_config.mqtt_password,
-        .credentials.client_id = g_device_config.device_mac,  // 使用 MAC 作為 client ID
+        .credentials.client_id = g_device_config.device_mac,
     };
-    
-    mqtt_handle = esp_mqtt_client_init(&mqtt_cfg);
-    if (mqtt_handle == NULL) {
-        ESP_LOGE(TAG, "Failed to initialize MQTT client");
-        return;
-    }
-    
+
+    mqtt_handle = esp_mqtt_client_init(&cfg);
     esp_mqtt_client_register_event(mqtt_handle, ESP_EVENT_ANY_ID, mqtt_event_callback, NULL);
-    
-    esp_err_t ret = esp_mqtt_client_start(mqtt_handle);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to start MQTT client: %s", esp_err_to_name(ret));
-    } else {
-        ESP_LOGI(TAG, "MQTT client started successfully");
-    }
+    esp_mqtt_client_start(mqtt_handle);
+    ESP_LOGI(TAG, "MQTT started: %s:%d", g_device_config.mqtt_host, g_device_config.mqtt_port);
 }
 
-// 重新連線 MQTT（使用新設定）
 void mqtt_reconnect_with_new_config(void) {
     if (mqtt_handle) {
         ESP_LOGI(TAG, "Reconnecting MQTT with new configuration");

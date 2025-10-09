@@ -2,6 +2,7 @@
 #define MY_MQTT_H
 #include "mqtt_client.h"
 #include <stdbool.h>
+#include "ota.h"
 extern esp_mqtt_client_handle_t mqtt_handle;
 // MQTT 初始化
 void mqtt_init(void);
@@ -25,4 +26,5 @@ void mqtt_stop(void);
 void mqtt_event_callback(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data);
 
 void mqtt_reconnect_task(void *pvParameters);
+
 #endif // MY_MQTT_H
