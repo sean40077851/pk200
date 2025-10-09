@@ -20,6 +20,7 @@
 #include "config_manager.h"  // 新增：設定管理
 #include "wifi.h"
 #include "my_mqtt.h"
+#include "ota.h"
 
 // UI includes
 #include "ui/ui.h"
@@ -75,7 +76,9 @@ void app_main(void) {
     wifi_init();
     ESP_LOGI(TAG, "WiFi initialized with SSID: %s", g_device_config.wifi_ssid);
     ESP_LOGI(TAG, "Device MAC: %s", g_device_config.device_mac);
-
+    //Initialize ota
+    ota_init();
+    ESP_LOGI(TAG, "OTA module ready");
     // Initialize LVGL
     lv_init();
     ESP_LOGI(TAG, "LVGL initialized");
