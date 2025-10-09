@@ -269,7 +269,7 @@ void mqtt_event_callback(void *handler_args, esp_event_base_t base, int32_t even
          }
         }
     }
-    // 處理主控制 topic (WE1/{MAC})
+    // 處理主控制 topic (WE1/{MAC})1
     else if (strncmp(event->topic, device_topic, event->topic_len) == 0) {
         char json_buffer[128];
         if (event->data_len < sizeof(json_buffer)) {
