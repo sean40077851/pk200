@@ -32,8 +32,8 @@ class OTARequestHandler(BaseHTTPRequestHandler):
         filename = decoded_path.lstrip('/')
         filepath = os.path.join(FIRMWARE_DIR, filename)
         
-        print(f"📥 Request: {decoded_path}")
-        print(f"📂 Looking for: {filepath}")
+        print(f" Request: {decoded_path}")
+        print(f" Looking for: {filepath}")
         
         # 檢查檔案是否存在
         if not os.path.exists(filepath):
@@ -48,9 +48,9 @@ class OTARequestHandler(BaseHTTPRequestHandler):
                 self.send_header('Content-Length', str(os.path.getsize(filepath)))
                 self.end_headers()
                 self.wfile.write(f.read())
-            print(f"✅ Sent: {filename}")
+            print(f" Sent: {filename}")
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f" Error: {e}")
             self.send_error(500, str(e))
     
     def list_directory(self):
@@ -83,7 +83,7 @@ def get_local_ip():
 
 
 def on_message(client, userdata, msg):
-    print(f"\n📨 RECEIVE MQTT topic={msg.topic} payload={msg.payload.decode()}")
+    print(f"\n RECEIVE MQTT topic={msg.topic} payload={msg.payload.decode()}")
     try:
         data = json.loads(msg.payload.decode())
         meter_id = data.get("meterID")
@@ -92,12 +92,12 @@ def on_message(client, userdata, msg):
 
         files = [f for f in os.listdir(FIRMWARE_DIR) if f.endswith(".bin")]
         if not files:
-            print("❌ NO OTA FILE")
+            print(" NO OTA FILE")
             return
 
         file_name = files[0]
         ota_url = f"http://27.105.113.156:1577/{file_name}"
-        print(f"🔗 OTA_URL：{ota_url}")
+        print(f" OTA_URL：{ota_url}")
 
         ver_index = file_name.find("Stv") + 3
         update_ver = int(file_name[ver_index:ver_index+6].replace(".", ""), 10) if ver_index >= 3 else 999999
@@ -106,7 +106,7 @@ def on_message(client, userdata, msg):
         except:
             current_ver = 0
 
-        print(f"📊 STM32 {current_ver}，更新版本 {update_ver}")
+        print(f" STM32 {current_ver}，更新版本 {update_ver}")
         if cmd_mode == "update" and update_ver != current_ver:
             size_start = file_name.find("size") + 4
             crc_start = file_name.find("crc") + 3
@@ -129,12 +129,12 @@ def on_message(client, userdata, msg):
 
             target_topic = f"eMeterConfigSet/{meter_id}"
             client.publish(target_topic, json.dumps(config_msg))
-            print(f"✅ 已發送到 {target_topic}")
+            print(f" 已發送到 {target_topic}")
         else:
-            print("⏭️ NO UPDATE")
+            print("⏭ NO UPDATE")
 
     except Exception as e:
-        print("❌ ERROR：", e)
+        print(" ERROR：", e)
 
 
 def start_mqtt():
@@ -143,16 +143,17 @@ def start_mqtt():
     client.on_message = on_message
     client.connect(MQTT_BROKER, MQTT_PORT, 60)
     client.subscribe(MQTT_TOPIC)
-    print(f"📡 MQTT 監聽 {MQTT_TOPIC}")
+    print(f" MQTT 監聽 {MQTT_TOPIC}")
     client.loop_forever()
+    
 
 
 def start_http():
     httpd = HTTPServer(('0.0.0.0', PORT), OTARequestHandler)
     local_ip = get_local_ip()
-    print(f"🌐 HTTP Server running at http://{local_ip}:{PORT}/")
-    print(f"📁 Serving from: {FIRMWARE_DIR}")
-    print(f"📋 Files: {os.listdir(FIRMWARE_DIR)}")
+    print(f" HTTP Server running at http://{local_ip}:{PORT}/")
+    print(f" Serving from: {FIRMWARE_DIR}")
+    print(f" Files: {os.listdir(FIRMWARE_DIR)}")
     httpd.serve_forever()
 
 
@@ -161,37 +162,38 @@ def publish_ota():
     client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
     client.connect(MQTT_BROKER, MQTT_PORT, 60)
     client.loop_start()
+    
 
     files = [f for f in os.listdir(FIRMWARE_DIR) if f.endswith(".bin")]
     if not files:
-        print("❌ No .bin file in FILE/")
+        print(" No .bin file in FILE/")
         return
 
     latest = sorted(files)[-1]
     ota_url = f"http://{get_local_ip()}:{PORT}/{latest}"
     payload = {"url": ota_url}
 
-    print(f"📡 Publishing OTA URL: {ota_url}")
+    print(f" Publishing OTA URL: {ota_url}")
     client.publish("wi485update", json.dumps(payload))
-    print("✅ OTA command sent")
+    print(" OTA command sent")
     time.sleep(1)
     client.loop_stop()
 
 
 if __name__ == "__main__":
     # 先印出除錯資訊
-    print(f"📂 FIRMWARE_DIR = {FIRMWARE_DIR}")
-    print(f"📂 存在: {os.path.exists(FIRMWARE_DIR)}")
+    print(f" FIRMWARE_DIR = {FIRMWARE_DIR}")
+    print(f" 存在: {os.path.exists(FIRMWARE_DIR)}")
     if os.path.exists(FIRMWARE_DIR):
-        print(f"📋 檔案: {os.listdir(FIRMWARE_DIR)}")
+        print(f" 檔案: {os.listdir(FIRMWARE_DIR)}")
     
     threading.Thread(target=start_http, daemon=True).start()
     time.sleep(2)
     publish_ota()
     
-    print("✅ Server is running. Press Ctrl+C to stop.")
+    print(" Server is running. Press Ctrl+C to stop.")
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        print("\n🛑 Server stopped")
+        print("\n Server stopped")
