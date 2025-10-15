@@ -170,7 +170,7 @@ def publish_ota():
         return
 
     latest = sorted(files)[-1]
-    ota_url = f"http://{get_local_ip()}:{PORT}/{latest}"
+    ota_url = f"http://27.105.113.156:{PORT}/{latest}"
     payload = {"url": ota_url}
 
     print(f" Publishing OTA URL: {ota_url}")

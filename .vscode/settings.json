@@ -26,6 +26,7 @@
     "wifi.h": "c",
     "display_driver.h": "c",
     "ui.h": "c",
-    "ota.h": "c"
+    "ota.h": "c",
+    "string.h": "c"
   }
 }

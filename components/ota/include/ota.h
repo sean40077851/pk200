@@ -50,6 +50,10 @@ bool ota_is_in_progress(void);
  * @return ESP_OK 代表已成功建立 OTA 任務，其他值代表失敗原因。
  */
 esp_err_t ota_start_async(const char *url);
+/**
+ * @brief 這個函式會執行 OTA 更新版本檢查
+ */
+void check_firmware_version(void);
 
 #ifdef __cplusplus
 }

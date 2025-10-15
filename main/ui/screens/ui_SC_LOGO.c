@@ -47,7 +47,7 @@ void ui_SC_LOGO_screen_init(void)
     lv_obj_set_x(ui_logoLabel2, 120);                    // X座標-53
     lv_obj_set_y(ui_logoLabel2, 130);                     // Y座標36
     lv_obj_set_align(ui_logoLabel2, LV_ALIGN_CENTER);    // 置中對齊
-    lv_label_set_text(ui_logoLabel2, "PK200 Camera "); // 設定標題文字
+    lv_label_set_text(ui_logoLabel2, "PK200000 Camera "); // 設定標題文字
     lv_obj_set_style_text_color(ui_logoLabel2, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT); // 文字顏色黑
     lv_obj_set_style_text_opa(ui_logoLabel2, 255, LV_PART_MAIN | LV_STATE_DEFAULT); // 文字不透明
     lv_obj_set_style_text_font(ui_logoLabel2,&lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT); // 設定字體

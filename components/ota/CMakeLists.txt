@@ -6,4 +6,5 @@ idf_component_register(
         app_update
         esp_system
         wifi
+        json
 )
