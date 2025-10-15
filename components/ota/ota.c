@@ -9,7 +9,8 @@
 #include "string.h"
 #include "stdlib.h"
 #include "wifi.h"
-
+#include "cJSON.h"
+#include "../config_manager/include/config_manager.h"
 #define TAG "OTA"
 #define OTA_TASK_STACK_SIZE 8192
 #define OTA_TASK_PRIORITY   5
@@ -227,4 +228,38 @@ esp_err_t ota_start_async(const char *url)
     s_ota_in_progress = true;
     ESP_LOGI(TAG, "OTA task created successfully");
     return ESP_OK;
+}
+void check_firmware_version(void)
+{
+    // 當前韌體版本
+    const char *current_ver = g_device_config.fw_version;
+
+    // HTTP GET 最新版本 JSON
+    esp_http_client_config_t config = {
+        .url = "https://ota.example.com/version.json",
+        .cert_pem =  NULL,
+    };
+
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+    esp_http_client_perform(client);
+
+    char buffer[256];
+    int len = esp_http_client_read(client, buffer, sizeof(buffer)-1);
+    buffer[len] = '\0';
+
+    // 從 JSON 解析出最新版本號
+    cJSON *json = cJSON_Parse(buffer);
+    const char *latest = cJSON_GetObjectItem(json, "latest_version")->valuestring;
+    const char *url = cJSON_GetObjectItem(json, "url")->valuestring;
+
+    // 比對版本
+    if (strcmp(current_ver, latest) != 0) {
+        ESP_LOGI(TAG, "New firmware %s available (current %s)", latest, current_ver);
+        ota_start_async(url);   // 啟動 OTA 更新
+    } else {
+        ESP_LOGI(TAG, "Firmware is up-to-date (%s)", current_ver);
+    }
+
+    cJSON_Delete(json);
+    esp_http_client_cleanup(client);
 }
