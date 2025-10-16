@@ -218,8 +218,17 @@ void mqtt_event_callback(void *handler_args, esp_event_base_t base, int32_t even
 
             ESP_LOGI(TAG, "Subscribed: %s, %s, %s, %s",
                      device_topic, mqttset_topic, wifiset_topic, ota_set_topic);
+<<<<<<< HEAD
             
 
+=======
+<<<<<<< Updated upstream
+=======
+            
+
+            
+>>>>>>> Stashed changes
+>>>>>>> ota
             check_firmware_version();
 
             break;

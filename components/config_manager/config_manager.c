@@ -9,7 +9,7 @@
 #define TAG "CONFIG"
 #define NVS_NAMESPACE "device_config"
 #define CONFIG_KEY "config_data"
-#define FW_VERSION "PK200-wentai-v0.6.1"
+#define FW_VERSION "PK200-wentai-v0.6.2"
 
 // 全域設定變數
 device_config_t g_device_config;
@@ -212,6 +212,7 @@ esp_err_t config_update_mqtt_from_json(const char* json_str) {
         ESP_LOGI(TAG, "Updated MQTT password");
     }
     
+    strcpy(g_device_config.fw_version, FW_VERSION);
     cJSON_Delete(json);
     
     // 儲存更新的設定
@@ -259,7 +260,7 @@ esp_err_t config_update_wifi_from_json(const char* json_str) {
         g_device_config.subnet[sizeof(g_device_config.subnet) - 1] = '\0';
         ESP_LOGI(TAG, "Updated netmask: %s", g_device_config.subnet);
     }
-    
+    strcpy(g_device_config.fw_version, FW_VERSION);
     cJSON_Delete(json);
     
     // 儲存更新的設定
