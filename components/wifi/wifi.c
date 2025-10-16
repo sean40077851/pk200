@@ -108,4 +108,4 @@ void wifi_init(void) {
     // 11. 顯示初始化完成訊息
     ESP_LOGI("WIFI", "WiFi initialized in STA mode");
 
-}
+} 
