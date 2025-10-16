@@ -41,6 +41,18 @@ void ui_SC_LOGO_screen_init(void)
     lv_obj_clear_flag(ui_Panel1, LV_OBJ_FLAG_SCROLLABLE); // 取消可捲動
 
 
+
+    ui_Label2 = lv_label_create(ui_SC_LOGO);         // 建立標題標籤
+    lv_obj_set_width(ui_Label2, LV_SIZE_CONTENT);    // 寬度自適應
+    lv_obj_set_height(ui_Label2, LV_SIZE_CONTENT);   // 高度自適應
+    lv_obj_set_x(ui_Label2, 120);                    // X座標-53
+    lv_obj_set_y(ui_Label2, 130);                     // Y座標36
+    lv_obj_set_align(ui_Label2, LV_ALIGN_CENTER);    // 置中對齊
+    lv_label_set_text(ui_Label2, "PK200 Camera "); // 設定標題文字
+    lv_obj_set_style_text_color(ui_Label2, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT); // 文字顏色黑
+    lv_obj_set_style_text_opa(ui_Label2, 255, LV_PART_MAIN | LV_STATE_DEFAULT); // 文字不透明
+    lv_obj_set_style_text_font(ui_Label2,&lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT); // 設定字體
+
     ui_logoLabel2 = lv_label_create(ui_SC_LOGO);         // 建立標題標籤
     lv_obj_set_width(ui_logoLabel2, LV_SIZE_CONTENT);    // 寬度自適應
     lv_obj_set_height(ui_logoLabel2, LV_SIZE_CONTENT);   // 高度自適應
