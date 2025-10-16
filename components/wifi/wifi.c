@@ -191,7 +191,6 @@ void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id
             vTaskDelay(pdMS_TO_TICKS(10000));
 
             retry_count = 0; // 重設重試次數
-            esp_wifi_connect(); // 再次發起連線
         }
     }
 
