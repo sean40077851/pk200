@@ -81,11 +81,11 @@ void wifi_reconnect_with_new_config(void) {
     wifi_config_t wifi_config = {0};        // 建立 WiFi 設定結構
     strcpy((char*)wifi_config.sta.ssid, g_device_config.wifi_ssid); // 設定 SSID
     strcpy((char*)wifi_config.sta.password, g_device_config.wifi_password); // 設定密碼
-    if (strlen(g_device_config.wifi_password) == 0) { // 無密碼
-        wifi_config.sta.threshold.authmode = WIFI_AUTH_OPEN;
+    if (strlen(g_device_config.wifi_password) == 0) { 
+        wifi_config.sta.threshold.authmode = WIFI_AUTH_OPEN; // 無密碼
         ESP_LOGI(TAG, "Using OPEN authentication (no password)");
     } else {
-        wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
+        wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK; //有密碼
         ESP_LOGI(TAG, "Using WPA2_PSK authentication");
     }
     wifi_config.sta.pmf_cfg.capable = true; // 啟用 PMF

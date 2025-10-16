@@ -231,35 +231,68 @@ esp_err_t ota_start_async(const char *url)
 }
 void check_firmware_version(void)
 {
-    // 當前韌體版本
-    const char *current_ver = g_device_config.fw_version;
+        const char *current_ver = g_device_config.fw_version;
+    const char *version_url = "http://27.105.113.156:1577/version.json";
+    ESP_LOGI(TAG, "Checking firmware version via HTTP...");
 
-    // HTTP GET 最新版本 JSON
     esp_http_client_config_t config = {
-        .url = "https://ota.example.com/version.json",
-        .cert_pem =  NULL,
+        .url = version_url,
+        .timeout_ms = 10000,
     };
 
     esp_http_client_handle_t client = esp_http_client_init(&config);
-    esp_http_client_perform(client);
+    if (!client) return;
 
-    char buffer[256];
-    int len = esp_http_client_read(client, buffer, sizeof(buffer)-1);
-    buffer[len] = '\0';
-
-    // 從 JSON 解析出最新版本號
-    cJSON *json = cJSON_Parse(buffer);
-    const char *latest = cJSON_GetObjectItem(json, "latest_version")->valuestring;
-    const char *url = cJSON_GetObjectItem(json, "url")->valuestring;
-
-    // 比對版本
-    if (strcmp(current_ver, latest) != 0) {
-        ESP_LOGI(TAG, "New firmware %s available (current %s)", latest, current_ver);
-        ota_start_async(url);   // 啟動 OTA 更新
-    } else {
-        ESP_LOGI(TAG, "Firmware is up-to-date (%s)", current_ver);
+    esp_err_t err = esp_http_client_perform(client);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "HTTP GET failed: %s", esp_err_to_name(err));
+        esp_http_client_cleanup(client);
+        return;
     }
+
+    int status = esp_http_client_get_status_code(client);
+    int content_len = esp_http_client_get_content_length(client);
+    ESP_LOGI(TAG, "HTTP Status: %d, Content length: %d", status, content_len);
+
+    char buffer[512];
+    int data_read = 0;
+
+    esp_err_t err_open = esp_http_client_open(client, 0);
+    if (err_open != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to open HTTP connection: %s", esp_err_to_name(err_open));
+        esp_http_client_cleanup(client);
+        return;
+    }
+
+    data_read = esp_http_client_read(client, buffer, sizeof(buffer) - 1);
+    if (data_read <= 0) {
+        ESP_LOGE(TAG, "No version data read");
+        esp_http_client_close(client);
+        esp_http_client_cleanup(client);
+        return;
+    }
+
+    buffer[data_read] = '\0';
+    ESP_LOGI(TAG, "Version JSON: %s", buffer);
+    cJSON *json = cJSON_Parse(buffer);
+    if (!json) {
+        ESP_LOGE(TAG, "JSON parse error");
+        esp_http_client_cleanup(client);
+        return;
+    }
+
+    cJSON *ver = cJSON_GetObjectItem(json, "latest_version");
+    cJSON *url = cJSON_GetObjectItem(json, "url");
+    ESP_LOGW(TAG, "New version %s available12132164645465465, starting OTA...", ver->valuestring);
+    if (cJSON_IsString(ver) && cJSON_IsString(url)) {
+        if (strcmp(current_ver, ver->valuestring) != 0) {
+            ESP_LOGW(TAG, "New version %s available, starting OTA...", ver->valuestring);
+            ota_start_async(url->valuestring);
+        } else {
+            ESP_LOGI(TAG, "Firmware is up to date (%s)", current_ver);
+        }
 
     cJSON_Delete(json);
     esp_http_client_cleanup(client);
+}
 }

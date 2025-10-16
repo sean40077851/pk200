@@ -19,6 +19,7 @@ MQTT_PASSWORD = "test123"
 
 
 class OTARequestHandler(BaseHTTPRequestHandler):
+    
     def do_GET(self):
         # 解碼 URL
         decoded_path = unquote(self.path)
