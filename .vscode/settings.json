@@ -27,6 +27,11 @@
     "display_driver.h": "c",
     "ui.h": "c",
     "ota.h": "c",
-    "string.h": "c"
+    "string.h": "c",
+    "mqtt_client.h": "c",
+    "freertos.h": "c",
+    "ui_time.h": "c",
+    "esp_err.h": "c",
+    "lvgl.h": "c"
   }
 }

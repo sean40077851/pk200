@@ -2,7 +2,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <time.h>
-
+#include <sys/time.h> 
 lv_obj_t * ui_Home;
 lv_obj_t * ui_topbar;       // 上方資訊列
 lv_obj_t * ui_logo;         // 左上角 Logo Label/Image
@@ -42,6 +42,15 @@ lv_obj_t * ui_sw5_icon;
 lv_obj_t * ui_sw5_label;
 lv_obj_t * ui_sw6_icon;
 lv_obj_t * ui_sw6_label;
+
+// ===== 點擊時間 Label 事件 =====
+void ui_event_time_label(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    if (code == LV_EVENT_CLICKED) {
+        show_time_setting_screen();
+    }
+}
 void ui_event_menu_icon(lv_event_t * e)      // 菜單圖標事件處理函數
 {
     lv_event_code_t event_code = lv_event_get_code(e);  // 獲取事件代碼
@@ -64,6 +73,7 @@ void ui_time_tick_task(lv_timer_t * t) {
         // 時間還沒同步，顯示預設字串
         lv_label_set_text(ui_time, "--:--:--");
         lv_label_set_text(ui_date, "--/--");
+        
     } else {
         // 格式化時間字串（時:分:秒），並顯示到 ui_time label
         snprintf(buf, sizeof(buf), "%02d:%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
@@ -490,7 +500,8 @@ void ui_Home_screen_init(void)          // 主畫面初始化函數
     lv_obj_align(ui_sw6_label, LV_ALIGN_CENTER, 0, 10);
     lv_obj_add_event_cb(ui_sw6, ui_event_sw6, LV_EVENT_CLICKED, NULL);
     
-    
+   /* lv_obj_add_flag(ui_time, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_event_cb(ui_time, ui_event_time_label, LV_EVENT_CLICKED, NULL);*/
 
 }
 

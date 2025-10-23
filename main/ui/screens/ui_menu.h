@@ -17,4 +17,5 @@ extern void btn_event_cb(lv_event_t *e);
 extern void ui_menu_screen_init(void);
 extern void back_btn_event(lv_event_t * e);
 extern void menu_to_ver_event(lv_event_t * e);
+extern void menu_back_btn_event(lv_event_t * e);
 #endif // UI_MENU_H

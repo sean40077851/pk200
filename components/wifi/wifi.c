@@ -20,20 +20,90 @@ static const int max_retry = 3;             // 最大重試次數
 // 外部函數聲明
 extern void mqtt_init(void);                // MQTT 初始化函式
 extern void mqtt_reconnect_with_new_config(void); // MQTT 重新連線函式
+nvs_handle_t time_nvs_handle;
 
-// SNTP 初始化（同步網路時間）
-void sntp_init_time(void) {
-    if (esp_sntp_enabled()) {               // 如果 SNTP 已啟用
-        ESP_LOGI(TAG, "SNTP already initialized, skip"); // 輸出日誌
-        return;                             // 不重複初始化
+// === 初始化 NVS，用來存時間 ===
+void nvs_time_init(void)
+{
+    esp_err_t err = nvs_flash_init();
+    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        nvs_flash_erase();
+        nvs_flash_init();
     }
-    ESP_LOGI(TAG, "Initializing SNTP...");  // 輸出日誌
-    sntp_setoperatingmode(SNTP_OPMODE_POLL);// 設定 SNTP 為輪詢模式
-    sntp_setservername(0, "pool.ntp.org");  // 設定 NTP 伺服器
-    sntp_init();                            // 啟動 SNTP
-    setenv("TZ", "CST-8", 1);               // 設定時區（中國標準時間）
-    tzset();                                // 套用時區設定
+    err = nvs_open("time_data", NVS_READWRITE, &time_nvs_handle);
+    if (err == ESP_OK) {
+        ESP_LOGI(TAG, "NVS opened for time_data");
+    } else {
+        ESP_LOGE(TAG, "Failed to open NVS: %s", esp_err_to_name(err));
+    }
 }
+
+// === 儲存目前 UNIX 時間到 NVS ===
+void nvs_save_time(time_t now)
+{
+    esp_err_t err = nvs_set_i64(time_nvs_handle, "saved_time", (int64_t)now);
+    if (err == ESP_OK) {
+        nvs_commit(time_nvs_handle);
+        ESP_LOGI(TAG, "Saved current time: %lld", (long long)now);
+    } else {
+        ESP_LOGE(TAG, "Failed to save time: %s", esp_err_to_name(err));
+    }
+}
+
+// === 從 NVS 載入上次時間 ===
+time_t nvs_load_time(void)
+{
+    int64_t saved_time = 0;
+    esp_err_t err = nvs_get_i64(time_nvs_handle, "saved_time", &saved_time);
+    if (err == ESP_OK) {
+        ESP_LOGI(TAG, "Loaded saved time: %lld", (long long)saved_time);
+        return (time_t)saved_time;
+    }
+    ESP_LOGW(TAG, "No saved time found");
+    return 0;
+}
+
+// === SNTP 同步通知回呼 ===
+static void time_sync_notification_cb(struct timeval *tv)
+{
+    time_t now;
+    time(&now);
+    ESP_LOGI(TAG, "SNTP synchronized: %s", ctime(&now));
+
+    
+    nvs_save_time(now);
+}
+
+// === 初始化 SNTP ===
+void sntp_init_time(void)
+{
+    if (esp_sntp_enabled()) {
+        ESP_LOGI(TAG, "SNTP already initialized");
+        return;
+    }
+
+    ESP_LOGI(TAG, "Initializing SNTP...");
+    sntp_setoperatingmode(SNTP_OPMODE_POLL);
+    sntp_setservername(0, "pool.ntp.org");
+    sntp_set_time_sync_notification_cb(time_sync_notification_cb); // 設定回呼
+    sntp_init();
+
+
+}
+
+// === 開機時若無網路，從 NVS 還原時間 ===
+void restore_time_from_nvs(void)
+{
+    time_t saved = nvs_load_time();
+    if (saved > 1609459200) { // 2021-01-01 00:00:00
+        struct timeval now = { .tv_sec = saved };
+        settimeofday(&now, NULL);
+        ESP_LOGI(TAG, "Time restored from NVS: %s", ctime(&saved));
+    } else {
+        ESP_LOGW(TAG, "No valid saved time to restore");
+    }
+}
+
 
 // 套用 IP 設定（DHCP 或固定 IP）
 void wifi_apply_ip_config(void) {
@@ -282,6 +352,7 @@ void wifi_init(void) {
     ESP_LOGI(TAG, "Event loop created");
     // 6. 建立預設的 WiFi STA 網路介面
     sta_netif = esp_netif_create_default_wifi_sta();
+    
     ESP_LOGI(TAG, "WiFi STA interface created");
     // 7. 設定 WiFi 初始化參數
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();

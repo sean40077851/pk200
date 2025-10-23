@@ -11,9 +11,12 @@ extern "C" {
 #endif
 
 // SCREEN: ui_Home
+extern void btn_confirm_event_cb(lv_event_t * e);
+extern void show_time_setting_screen(void);
+extern void ui_event_time_label(lv_event_t * e);
 extern void ui_Home_screen_init(void);
 extern void ui_Home_screen_destroy(void);
-void ui_time_tick_task(lv_timer_t * t);
+extern void ui_time_tick_task(lv_timer_t * t);
 extern void ui_event_menu_icon(lv_event_t * e);
 extern void ui_event_button1_button(lv_event_t * e);
 extern void ui_event_sw1(lv_event_t * e);

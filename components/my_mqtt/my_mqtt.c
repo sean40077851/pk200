@@ -13,11 +13,11 @@ esp_mqtt_client_handle_t mqtt_handle = NULL;   // MQTT 客戶端 handle，全域
 static bool mqtt_connected = false;            // MQTT 連線狀態旗標
 static bool mqtt_need_reconnect = false;       // 是否需要重連 MQTT
 
-static char device_topic[64];                  // 儲存 WE1/{MAC} topic 字串
-static char mqttset_topic[64];                 // 儲存 WE1/{MAC}/MQTTset topic 字串
-static char wifiset_topic[64];                 // 儲存 WE1/{MAC}/WIFIset topic 字串
-static char ota_status_topic[64];              // 儲存 WE1/{MAC}/OTA/status topic 字串
-static const char *ota_set_topic = "wi485update"; // OTA 廣播 topic 字串
+static char device_topic[64];                 
+static char mqttset_topic[64];                
+static char wifiset_topic[64];                
+static char ota_status_topic[64];              
+static const char *ota_set_topic = "wi485update"; 
 
 extern void wifi_reconnect_with_new_config(void); // 外部 WiFi 重新連線函式
 extern void wifi_apply_ip_config(void);           // 外部 IP 設定函式
@@ -220,7 +220,6 @@ void mqtt_event_callback(void *handler_args, esp_event_base_t base, int32_t even
                      device_topic, mqttset_topic, wifiset_topic, ota_set_topic);
 
             check_firmware_version();
-
             break;
 
         case MQTT_EVENT_DISCONNECTED:             // 斷線

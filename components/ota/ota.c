@@ -231,7 +231,7 @@ esp_err_t ota_start_async(const char *url)
 }
 void check_firmware_version(void)
 {
-        const char *current_ver = g_device_config.fw_version;
+    const char *current_ver = g_device_config.fw_version;
     const char *version_url = "http://27.105.113.156:1577/version.json";
     ESP_LOGI(TAG, "Checking firmware version via HTTP...");
 
@@ -280,10 +280,16 @@ void check_firmware_version(void)
         esp_http_client_cleanup(client);
         return;
     }
-
     cJSON *ver = cJSON_GetObjectItem(json, "latest_version");
     cJSON *url = cJSON_GetObjectItem(json, "url");
-    ESP_LOGW(TAG, "New version %s available12132164645465465, starting OTA...", ver->valuestring);
+    cJSON *update_flag=cJSON_GetObjectItem(json,"update");
+    if (!cJSON_IsBool(update_flag) || !cJSON_IsTrue(update_flag))
+    {
+        ESP_LOGI(TAG, "Update flag is false or missing, skipping OTA");
+        cJSON_Delete(json);
+        esp_http_client_cleanup(client);
+        return;
+    }
     if (cJSON_IsString(ver) && cJSON_IsString(url)) {
         if (strcmp(current_ver, ver->valuestring) != 0) {
             ESP_LOGW(TAG, "New version %s available, starting OTA...", ver->valuestring);

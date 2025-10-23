@@ -24,7 +24,6 @@ extern "C" {
 #include "screens/ui_Step1.h"
 #include "screens/ui_Step2.h"
 #include "screens/ui_Connect.h"
-#include "screens/ui_Welcome.h"
 #include "screens/ui_Charging.h"
 #include "screens/ui_End.h"
 #include "screens/ui_menu.h"

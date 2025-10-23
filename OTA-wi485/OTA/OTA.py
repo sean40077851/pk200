@@ -190,7 +190,7 @@ if __name__ == "__main__":
     
     threading.Thread(target=start_http, daemon=True).start()
     time.sleep(2)
-    publish_ota()
+    # publish_ota()
     
     print(" Server is running. Press Ctrl+C to stop.")
     try:

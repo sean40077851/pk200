@@ -27,7 +27,7 @@ void ui_event_card4_card(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_Welcome, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Welcome_screen_init);
+        _ui_screen_change(&ui_Home, LV_SCR_LOAD_ANIM_FADE_ON, 500, 0, &ui_Home_screen_init);
     }
 }
 
@@ -36,7 +36,7 @@ void ui_event_card4_cardbg2(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_CLICKED) {
-        _ui_screen_change(&ui_Welcome, LV_SCR_LOAD_ANIM_FADE_ON, 100, 200, &ui_Welcome_screen_init);
+        _ui_screen_change(&ui_Home, LV_SCR_LOAD_ANIM_FADE_ON, 100, 200, &ui_Home_screen_init);
     }
 }
 

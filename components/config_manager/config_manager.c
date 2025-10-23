@@ -18,7 +18,7 @@ device_config_t g_device_config;
 void config_set_default_values(void) {
     // 預設 WiFi 設定
     strcpy(g_device_config.wifi_ssid,"A100");
-    //strcpy(g_device_config.wifi_password, "12345678");
+    //strcpy(g_device_config.wifi_password, "00000000");
     
     // 預設 IP 設定 (ip_mode=2 表示預設)
     g_device_config.ip_mode = 2;

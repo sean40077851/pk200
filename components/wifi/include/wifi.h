@@ -9,6 +9,9 @@ void wifi_init(void);
 // WiFi 重新連線（使用新設定）
 void wifi_reconnect_with_new_config(void);
 
+void restore_time_from_nvs(void);
+void nvs_time_init(void);
+
 // 檢查 WiFi 連線狀態
 bool wifi_is_connected(void);
 

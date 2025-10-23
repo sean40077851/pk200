@@ -11,7 +11,6 @@ SET(SOURCES components/ui_comp_button.c
     screens/ui_Step1.c
     screens/ui_Step2.c
     screens/ui_Connect.c
-    screens/ui_Welcome.c
     screens/ui_Charging.c
     screens/ui_End.c
     screens/ui_menu.c

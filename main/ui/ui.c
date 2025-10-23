@@ -574,7 +574,6 @@ void ui_init(void)
     ui_SC_LOGO_screen_init();
     lv_scr_load(ui_SC_LOGO);
 
-    // 延遲 2 秒切換到 Home
     ui_Home_screen_init();
     lv_timer_create(splash_timer_cb, 5000, NULL);
     lv_timer_create(ui_time_tick_task, 1000, NULL);
@@ -586,7 +585,6 @@ void ui_destroy(void)
     ui_Step1_screen_destroy();
     ui_Step2_screen_destroy();
     ui_Connect_screen_destroy();
-    ui_Welcome_screen_destroy();
     ui_Charging_screen_destroy();
     ui_End_screen_destroy();
 }
