@@ -11,6 +11,7 @@
 #include "esp_event.h"
 #include "driver/gpio.h"
 #include "esp_sntp.h"  
+#include "sdstorage.h"
 
 // LVGL includes
 #include "lvgl.h"
@@ -34,6 +35,15 @@ void lvgl_task(void *parameter) {
         lv_timer_handler();
         vTaskDelay(pdMS_TO_TICKS(5));  // 5ms delay for ~200Hz task rate, better responsiveness
     }
+}
+void sdcard_test_task(void *pvParameters){
+    vTaskDelay(pdMS_TO_TICKS(5000));
+    sdcard_init();
+    ESP_LOGI("SD", "SD card test task started");
+    vTaskDelay(pdMS_TO_TICKS(500));
+    sdcard_test();                // 你原本寫的測試函式
+    ESP_LOGI("SD", "SD card test completed");
+    vTaskDelete(NULL);            // 執行完畢自動刪除任務
 }
 
 // 系統狀態監控任務
@@ -103,6 +113,7 @@ void app_main(void) {
     ui_init();
     ESP_LOGI(TAG, "UI initialized");
 
+
     // Create LVGL task with higher priority and larger stack for better performance
     xTaskCreate(lvgl_task, "lvgl_task", 8192, NULL, 10, NULL);  // Higher priority (10) and larger stack
     ESP_LOGI(TAG, "LVGL task created with high priority");
@@ -110,7 +121,7 @@ void app_main(void) {
     // Create system monitor task
     xTaskCreate(system_monitor_task, "sys_monitor", 4096, NULL, 5, NULL);
     ESP_LOGI(TAG, "System monitor task created");
-    
+    xTaskCreate(sdcard_test_task, "sd_test", 8192, NULL, 2, NULL);
     // Create MQTT reconnect handler task
     extern void mqtt_reconnect_task(void *pvParameters);
     xTaskCreate(mqtt_reconnect_task, "mqtt_reconnect", 4096, NULL, 5, NULL);

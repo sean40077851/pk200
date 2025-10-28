@@ -32,6 +32,10 @@
     "freertos.h": "c",
     "ui_time.h": "c",
     "esp_err.h": "c",
-    "lvgl.h": "c"
+    "lvgl.h": "c",
+    "stdio.h": "c",
+    "storage.h": "c",
+    "sdmmc_cmd.h": "c",
+    "sdmmc_host.h": "c"
   }
 }
